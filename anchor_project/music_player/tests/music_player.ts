@@ -67,5 +67,35 @@ it("Uploads a track with track_id", async () => {
 });
 });
 
+it("Creates a playlist", async () => {
+  const user = provider.wallet;
+  const playlistId = new BN(1);
+
+  const playlistIdLe = Buffer.from(playlistId.toArrayLike(Buffer, "le", 8));
+
+  const [playlistPda] = PublicKey.findProgramAddressSync(
+    [Buffer.from("playlist"), user.publicKey.toBuffer(), playlistIdLe],
+    program.programId
+  );
+await program.methods
+  .createPlaylist(playlistId, "My Playlist", "My favorite tracks")
+  .accounts({
+    signer: user.publicKey,
+  })
+  .rpc();
+
+  const playlistAccount = await program.account.playlist.fetch(playlistPda);
+
+  assert.equal(playlistAccount.name, "My Playlist");
+  assert.equal(playlistAccount.description, "My favorite tracks");
+  assert.deepEqual(playlistAccount.tracks, []);
+
+  console.log("Playlist account data:", {
+  owner: playlistAccount.owner.toBase58(),
+  title: playlistAccount.name,
+  description: playlistAccount.description,
+  createdAt: playlistAccount.createdAt.toNumber(),
+});
+});
 
 });

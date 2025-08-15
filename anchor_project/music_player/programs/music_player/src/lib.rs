@@ -4,7 +4,8 @@ pub mod state;        // user_profile.rs, track.rs, playlist.rs
 pub mod instructions; // initialize_user.rs, upload_track.rs, etc.
 pub mod errors;       // error definitions
 
-use instructions::*;  // so InitializeUser, UploadTrack, etc. are visible
+pub use instructions::*;  // so InitializeUser, UploadTrack, etc. are visible
+use instructions::*;
 
 declare_id!("B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie");
 
@@ -33,7 +34,14 @@ pub mod music_player {
     instructions::upload_track::handler(ctx, track_id, title, artist, genre, uri)
 }
 
-    
-    // pub fn create_playlist(...) -> Result<()> { ... }
+    pub fn create_playlist(
+        ctx: Context<CreatePlaylist>,
+        playlist_id: u64,
+        name: String,
+        description: String,
+    ) -> Result<()> {
+        instructions::create_playlist::handler(ctx, playlist_id, name, description)
+    }    
+
     // pub fn add_track_to_playlist(...) -> Result<()> { ... }
 }
