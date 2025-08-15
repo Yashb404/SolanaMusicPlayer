@@ -1,8 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[error_code]
-
-pub enum MusicPlayerError {
+pub enum ErrorCode {
     #[msg("Unauthorized action")]
     Unauthorized,
 
@@ -23,4 +22,20 @@ pub enum MusicPlayerError {
 
     #[msg("Operation not supported")]
     OperationNotSupported,
+
+    // Custom length validation errors
+    #[msg("Username exceeds maximum allowed length")]
+    UsernameTooLong,
+
+    #[msg("Email exceeds maximum allowed length")]
+    EmailTooLong,
+
+    #[msg("Track title exceeds maximum allowed length")]
+    TrackTitleTooLong,
+
+    #[msg("Artist name exceeds maximum allowed length")]
+    ArtistTooLong,
+
+    #[msg("Genre exceeds maximum allowed length")]
+    GenreTooLong,
 }
