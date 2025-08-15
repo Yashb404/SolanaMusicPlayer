@@ -21,7 +21,7 @@ pub mod music_player {
         instructions::initialize_user::handler(ctx, username, email)
     }
 
-    // TODO: add these later:
+    
 
     pub fn upload_track(
     ctx: Context<UploadTrack>,
@@ -43,5 +43,11 @@ pub mod music_player {
         instructions::create_playlist::handler(ctx, playlist_id, name, description)
     }    
 
-    // pub fn add_track_to_playlist(...) -> Result<()> { ... }
+    pub fn add_track_to_playlist(
+    ctx: Context<AddTrackToPlaylist>,
+   
+) -> Result<()> {
+    instructions::add_track_to_playlist::handler(ctx)
+}
+    
 }

@@ -21,7 +21,7 @@ impl Playlist {
         + 32
         + 4 + Self::MAX_NAME_LEN
         + 4 + Self::MAX_DESC_LEN
-        + 4 + (Self::MAX_TRACKS * 8)
+        + 4 + (Self::MAX_TRACKS * 32)
         + 8
         + 8;
 }
