@@ -21,7 +21,19 @@ pub mod music_player {
     }
 
     // TODO: add these later:
-    // pub fn upload_track(...) -> Result<()> { ... }
+
+    pub fn upload_track(
+    ctx: Context<UploadTrack>,
+    track_id: u64,
+    title: String,
+    artist: String,
+    genre: String,
+    uri: String,
+) -> Result<()> {
+    instructions::upload_track::handler(ctx, track_id, title, artist, genre, uri)
+}
+
+    
     // pub fn create_playlist(...) -> Result<()> { ... }
     // pub fn add_track_to_playlist(...) -> Result<()> { ... }
 }

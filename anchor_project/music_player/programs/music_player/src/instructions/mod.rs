@@ -4,3 +4,5 @@ pub mod initialize_user;
 // later: pub mod create_playlist;
 
 pub use initialize_user::*;
+pub mod upload_track;
+pub use upload_track::*;
