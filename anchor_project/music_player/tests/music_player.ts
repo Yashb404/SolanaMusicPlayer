@@ -57,6 +57,8 @@ it("Uploads a track with track_id", async () => {
   assert.equal(trackAccount.owner.toBase58(), user.publicKey.toBase58());
   assert.equal(trackAccount.title, "MyTitle");
   assert.equal(trackAccount.uri, "myTrackUri");
+  assert.equal(trackAccount.genre,"Genre");
+  assert.equal(trackAccount.artist,"Artist");
 
 });
 
@@ -86,45 +88,55 @@ await program.methods
   
 });
 
-it("uploads track to playlist", async()=>{
-  it("adds track to playlist", async () => {
-  // setup user, track, and playlist first
-  const userPublicKey = user.publicKey;
-  
-  const [trackPda] = PublicKey.findProgramAddressSync(
-  [Buffer.from("track"), userPublicKey.toBuffer(), Buffer.from("track_hash")],
-  program.programId
-);
 
-const [playlistPda] = PublicKey.findProgramAddressSync(
-  [Buffer.from("playlist"), userPublicKey.toBuffer(), Buffer.from("playlist_name")],
-  program.programId
-);
-  
-  
-  await program.methods
-    .addTrackToPlaylist()
-    .accounts({
-      playlist: playlistPda,
-      track: trackPda,
-      
-    })
-    .rpc();
-    
-  const playlist = await program.account.playlist.fetch(playlistPda);
-  assert.equal(playlist.tracks.length, 1);
+it("adds track to playlist", async () => {
+        const userPublicKey = user.publicKey;
 
+        // Note: The logic for deriving PDAs for assertions remains the same.
+        // We still need to find the address to check the account state.
+        const trackId = new BN(1);
+        const playlistId = new BN(2);
+        
+        const [trackPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("track"), userPublicKey.toBuffer(), trackId.toBuffer('le', 8)],
+            program.programId
+        );
 
-  console.log("✅ Track added to playlist:", playlist);
-  console.log("Playlist tracks:", playlist.tracks);
-  console.log("Track PDA:", trackPda.toBase58());
-  console.log("Playlist PDA:", playlistPda.toBase58());
-  console.log("User Public Key:", userPublicKey.toBase58());
-  console.log("Track ID:", trackPda.toBase58());
-  console.log("Playlist ID:", playlistPda.toBase58());
+        const [playlistPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("playlist"), userPublicKey.toBuffer(), playlistId.toBuffer('le', 8)],
+            program.programId
+        );
 
-});
+        await program.methods
+            .uploadTrack(trackId, "MyTitle", "Artist", "Genre", "track_hash")
+            .accounts({
+                signer: userPublicKey,
+            })
+            .rpc();
 
-})
+        
+        await program.methods
+            .createPlaylist(playlistId, "playlist_name", "my first playlist")
+            .accounts({
+                signer: userPublicKey,
+            })
+            .rpc();
+
+     
+        await program.methods
+            .addTrackToPlaylist()
+            .accounts({
+                playlist: playlistPda,
+                track: trackPda,
+            })
+            .rpc();
+       
+        const playlist = await program.account.playlist.fetch(playlistPda);
+        assert.equal(playlist.tracks.length, 1, "track should be added to playlist");
+        assert.equal(playlist.tracks[0].toNumber(), trackId.toNumber(), "track ID should match");
+
+        console.log(playlist.tracks[0].toNumber());
+        console.log(trackId.toNumber());
+    });
 
 });
