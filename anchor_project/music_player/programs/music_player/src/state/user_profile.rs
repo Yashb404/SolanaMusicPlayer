@@ -6,7 +6,7 @@ use anchor_lang::prelude::*;
 pub struct UserProfile {
     pub user: Pubkey,       // Owner of this profile
     pub username: String,   // Fixed space allocated
-    pub email: String,      // Fixed space allocated
+    pub email: String,    // Number of tracks uploaded by this user
     pub created_at: i64,
     pub updated_at: i64,
 }

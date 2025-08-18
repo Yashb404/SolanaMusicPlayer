@@ -20,14 +20,11 @@ pub fn handler(
 ) -> Result<()> {
     let playlist = &mut ctx.accounts.playlist;
     
-    // Check if the playlist has space for more tracks
     require!(
         playlist.tracks.len() < Playlist::MAX_TRACKS,
         ErrorCode::InvalidInputData
     );
 
-    // Push the track ID onto the vector.
-    // Assuming Track.id is a u64
     playlist.tracks.push(ctx.accounts.track.id);  
     playlist.updated_at = Clock::get()?.unix_timestamp;
 

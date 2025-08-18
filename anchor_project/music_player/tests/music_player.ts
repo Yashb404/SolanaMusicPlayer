@@ -5,8 +5,9 @@ import { PublicKey } from "@solana/web3.js";
 import { assert } from "chai";
 import BN from "bn.js";
 
+
 describe("music_player", () => {
-  // Configure the client to use the local cluster
+ 
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
@@ -36,9 +37,8 @@ describe("music_player", () => {
 
 it("Uploads a track with track_id", async () => {
   const user = provider.wallet;
-  const trackId = new BN(1);                      // ✅ u64 -> BN in Anchor TS
+  const trackId = new BN(1);                      
 
-  // ✅ derive PDA with LE 8-byte encoding (matches to_le_bytes on-chain)
   const trackIdLe = Buffer.from(trackId.toArrayLike(Buffer, "le", 8));
 
   const [trackPda] = PublicKey.findProgramAddressSync(
@@ -47,7 +47,7 @@ it("Uploads a track with track_id", async () => {
   );
 
   await program.methods
-    .uploadTrack(trackId, "MyTitle", "Artist", "Genre", "myTrackUri") // ✅ include trackId first
+    .uploadTrack(trackId, "MyTitle", "Artist", "Genre", "myTrackUri") 
     .accounts({
       signer: user.publicKey,
     })
@@ -58,13 +58,6 @@ it("Uploads a track with track_id", async () => {
   assert.equal(trackAccount.title, "MyTitle");
   assert.equal(trackAccount.uri, "myTrackUri");
 
-  console.log("Track account data:", {
-  owner: trackAccount.owner.toBase58(),
-  title: trackAccount.title,
-  artist: trackAccount.artist,
-  uri: trackAccount.uri,
-  createdAt: trackAccount.createdAt.toNumber(),
-});
 });
 
 it("Creates a playlist", async () => {
@@ -90,12 +83,48 @@ await program.methods
   assert.equal(playlistAccount.description, "My favorite tracks");
   assert.deepEqual(playlistAccount.tracks, []);
 
-  console.log("Playlist account data:", {
-  owner: playlistAccount.owner.toBase58(),
-  title: playlistAccount.name,
-  description: playlistAccount.description,
-  createdAt: playlistAccount.createdAt.toNumber(),
+  
 });
+
+it("uploads track to playlist", async()=>{
+  it("adds track to playlist", async () => {
+  // setup user, track, and playlist first
+  const userPublicKey = user.publicKey;
+  
+  const [trackPda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("track"), userPublicKey.toBuffer(), Buffer.from("track_hash")],
+  program.programId
+);
+
+const [playlistPda] = PublicKey.findProgramAddressSync(
+  [Buffer.from("playlist"), userPublicKey.toBuffer(), Buffer.from("playlist_name")],
+  program.programId
+);
+  
+  
+  await program.methods
+    .addTrackToPlaylist()
+    .accounts({
+      playlist: playlistPda,
+      track: trackPda,
+      
+    })
+    .rpc();
+    
+  const playlist = await program.account.playlist.fetch(playlistPda);
+  assert.equal(playlist.tracks.length, 1);
+
+
+  console.log("✅ Track added to playlist:", playlist);
+  console.log("Playlist tracks:", playlist.tracks);
+  console.log("Track PDA:", trackPda.toBase58());
+  console.log("Playlist PDA:", playlistPda.toBase58());
+  console.log("User Public Key:", userPublicKey.toBase58());
+  console.log("Track ID:", trackPda.toBase58());
+  console.log("Playlist ID:", playlistPda.toBase58());
+
 });
+
+})
 
 });
