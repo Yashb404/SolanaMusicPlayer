@@ -16,7 +16,7 @@ pub struct UploadTrack<'info> {
 
     #[account(mut)]
     pub signer: Signer<'info>,
-    pub system_program: Program<'info, System>,
+    pub system_program: Program<'info, System>, 
 }
 
 
@@ -36,6 +36,7 @@ pub fn handler(
     let track = &mut ctx.accounts.track;
     let clock = Clock::get()?;
 
+    track.id = track_id;
     track.owner = ctx.accounts.signer.key();
     track.title = title;
     track.artist = artist;

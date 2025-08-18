@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Track {
-    pub id: u64,                  // new field
+    pub id: u64,                  
     pub owner: Pubkey,
     pub title: String,
     pub artist: String,

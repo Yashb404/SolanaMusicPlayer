@@ -94,7 +94,7 @@ it("adds track to playlist", async () => {
 
         // Note: The logic for deriving PDAs for assertions remains the same.
         // We still need to find the address to check the account state.
-        const trackId = new BN(1);
+        const trackId = new BN(3);
         const playlistId = new BN(2);
         
         const [trackPda] = PublicKey.findProgramAddressSync(
@@ -135,8 +135,6 @@ it("adds track to playlist", async () => {
         assert.equal(playlist.tracks.length, 1, "track should be added to playlist");
         assert.equal(playlist.tracks[0].toNumber(), trackId.toNumber(), "track ID should match");
 
-        console.log(playlist.tracks[0].toNumber());
-        console.log(trackId.toNumber());
     });
 
 });
