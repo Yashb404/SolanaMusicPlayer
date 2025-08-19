@@ -49,5 +49,12 @@ pub mod music_player {
 ) -> Result<()> {
     instructions::add_track_to_playlist::handler(ctx)
 }
+
+pub fn remove_track_from_playlist(
+    ctx: Context<DeleteTrackFromPlaylist>,
+) -> Result<()> {
+    instructions::remove_track_from_playlist::handler(ctx)
+}
+
     
 }

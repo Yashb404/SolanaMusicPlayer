@@ -8,3 +8,6 @@ pub use upload_track::*;
 
 pub mod add_track_to_playlist;
 pub use add_track_to_playlist::*;
+
+pub mod remove_track_from_playlist;
+pub use remove_track_from_playlist::*;
