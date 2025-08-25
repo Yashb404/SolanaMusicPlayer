@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { Music, Plus, Wallet, Menu, X } from "lucide-react";
+import { Music, Plus, Menu,Wallet, X } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { MusicSidebar } from "./MusicSidebar";
@@ -25,25 +28,15 @@ interface MusicPlayerLayoutProps {
 }
 
 export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
+  
+  const { publicKey, connected } = useWallet();
+  
   const [isCreatePlaylistOpen, setIsCreatePlaylistOpen] = useState(false);
   const [isUploadTrackOpen, setIsUploadTrackOpen] = useState(false);
   const [playlists, setPlaylists] = useState<Playlist[]>([
     { id: "1", name: "My Favorites", tracks: [] },
     { id: "2", name: "Chill Vibes", tracks: [] }
   ]);
-
-  const connectWallet = async () => {
-    // Simulate wallet connection
-    setIsWalletConnected(true);
-    setWalletAddress("B4RY8x7K9mN2pQ3sT6uV1wX8zE5cF4dA9hL2nM6kDie");
-  };
-
-  const disconnectWallet = () => {
-    setIsWalletConnected(false);
-    setWalletAddress("");
-  };
 
   const createPlaylist = (name: string) => {
     const newPlaylist: Playlist = {
@@ -54,8 +47,14 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
     setPlaylists([...playlists, newPlaylist]);
   };
 
-  const truncateAddress = (address: string) => {
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  // Optional: Add wallet-dependent features
+  const handleUploadTrack = () => {
+    if (!connected) {
+      // TODO: Show wallet connection required message
+      console.log("Wallet connection required to upload tracks");
+      return;
+    }
+    setIsUploadTrackOpen(true);
   };
 
   return (
@@ -80,20 +79,15 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
 
               <div className="flex items-center gap-3">
                 <Button
-                  onClick={() => setIsUploadTrackOpen(true)}
+                  onClick={handleUploadTrack}
                   className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  disabled={!connected} // Disable upload if wallet not connected
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Upload Track
                 </Button>
 
-                <Button
-                  onClick={isWalletConnected ? disconnectWallet : connectWallet}
-                  variant={isWalletConnected ? "secondary" : "default"}
-                >
-                  <Wallet className="w-4 h-4 mr-2" />
-                  {isWalletConnected ? truncateAddress(walletAddress) : "Connect Wallet"}
-                </Button>
+                <WalletMultiButton />
               </div>
             </div>
           </header>
