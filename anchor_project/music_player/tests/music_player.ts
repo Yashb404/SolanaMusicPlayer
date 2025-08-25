@@ -92,8 +92,7 @@ await program.methods
 it("adds track to playlist", async () => {
         const userPublicKey = user.publicKey;
 
-        // Note: The logic for deriving PDAs for assertions remains the same.
-        // We still need to find the address to check the account state.
+        
         const trackId = new BN(3);
         const playlistId = new BN(2);
         
@@ -134,7 +133,74 @@ it("adds track to playlist", async () => {
         const playlist = await program.account.playlist.fetch(playlistPda);
         assert.equal(playlist.tracks.length, 1, "track should be added to playlist");
         assert.equal(playlist.tracks[0].toNumber(), trackId.toNumber(), "track ID should match");
-
+        assert.equal(playlist.owner.toBase58(), userPublicKey.toBase58(), "playlist owner should match");
     });
+
+
+    it("removes track from playlist", async () => {
+      const userPublicKey = user.publicKey;
+      
+      const trackId = new BN(4);
+      const playlistId = new BN(3);
+      
+      // Derive PDAs
+      const [trackPda] = PublicKey.findProgramAddressSync(
+          [Buffer.from("track"), userPublicKey.toBuffer(), trackId.toBuffer('le', 8)],
+          program.programId
+      );
+  
+      const [playlistPda] = PublicKey.findProgramAddressSync(
+          [Buffer.from("playlist"), userPublicKey.toBuffer(), playlistId.toBuffer('le', 8)],
+          program.programId
+      );
+  
+      // First upload the track
+      await program.methods
+          .uploadTrack(trackId, "TrackToRemove", "Artist", "Genre", "track_hash")
+          .accounts({
+              signer: userPublicKey,
+          })
+          .rpc();
+  
+      // Create the playlist
+      await program.methods
+          .createPlaylist(playlistId, "Test Playlist", "For testing removal")
+          .accounts({
+              signer: userPublicKey,
+          })
+          .rpc();
+  
+      // Add track to playlist first
+      await program.methods
+          .addTrackToPlaylist()
+          .accounts({
+              playlist: playlistPda,
+              track: trackPda,
+          })
+          .rpc();
+  
+      // Verify track was added
+      let playlist = await program.account.playlist.fetch(playlistPda);
+      assert.equal(playlist.tracks.length, 1, "track should be added to playlist");
+      assert.equal(playlist.tracks[0].toNumber(), trackId.toNumber(), "track ID should match");
+  
+      // Now remove the track from playlist
+      await program.methods
+          .removeTrackFromPlaylist()
+          .accounts({
+              playlist: playlistPda,
+              track: trackPda,
+              
+          })
+          .rpc();
+  
+      // Verify track was removed
+      playlist = await program.account.playlist.fetch(playlistPda);
+      assert.equal(playlist.tracks.length, 0, "track should be removed from playlist");
+      assert.isFalse(playlist.tracks.includes(trackId), "track ID should not be in playlist");
+      
+      // Verify playlist owner still matches
+      assert.equal(playlist.owner.toBase58(), userPublicKey.toBase58(), "playlist owner should still match");
+  });
 
 });
