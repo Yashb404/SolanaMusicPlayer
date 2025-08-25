@@ -16,12 +16,10 @@ pub struct DeleteTrackFromPlaylist<'info> {
 
 pub fn handler(ctx: Context<DeleteTrackFromPlaylist>) -> Result<()> {
     let playlist = &mut ctx.accounts.playlist;
-    let track_pubkey = ctx.accounts.track.key();
+    let track_id = ctx.accounts.track.id;  // Get the u64 track ID
 
-    // Convert Vec<u64> of track IDs to Pubkey vector for comparison
-    if let Some(pos) = playlist.tracks.iter().position(|id| {
-        Pubkey::new_from_array(id.to_le_bytes()) == track_pubkey
-    }) {
+    // Find and remove the track ID from the playlist
+    if let Some(pos) = playlist.tracks.iter().position(|&id| id == track_id) {
         playlist.tracks.remove(pos);
         playlist.updated_at = Clock::get()?.unix_timestamp;
         Ok(())

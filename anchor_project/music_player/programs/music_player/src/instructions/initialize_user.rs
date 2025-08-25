@@ -7,7 +7,7 @@ pub fn handler(
     username: String,
     email: String,
 ) -> Result<()> {
-    // validate lengths
+    
     require!(
         username.len() <= UserProfile::MAX_USERNAME_LEN,
         ErrorCode::UsernameTooLong
