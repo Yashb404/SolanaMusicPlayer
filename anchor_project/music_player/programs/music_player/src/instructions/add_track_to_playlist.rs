@@ -15,18 +15,11 @@ pub struct AddTrackToPlaylist<'info> {
     pub owner: Signer<'info>,
 }
 
-pub fn handler(
-    ctx: Context<AddTrackToPlaylist>,
-) -> Result<()> {
+#[inline(never)]
+pub fn handler(ctx: Context<AddTrackToPlaylist>) -> Result<()> {
     let playlist = &mut ctx.accounts.playlist;
-    
-    require!(
-        playlist.tracks.len() < Playlist::MAX_TRACKS,
-        ErrorCode::InvalidInputData
-    );
-
-    playlist.tracks.push(ctx.accounts.track.id);  
+    require!(playlist.tracks.len() < Playlist::MAX_TRACKS, ErrorCode::InvalidInputData);
+    playlist.tracks.push(ctx.accounts.track.id);
     playlist.updated_at = Clock::get()?.unix_timestamp;
-
     Ok(())
 }

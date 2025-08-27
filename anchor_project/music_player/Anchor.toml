@@ -17,6 +17,11 @@ wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+copy-idl = "mkdir -p ../../frontend/src/idl && cp target/idl/music_player.json ../../frontend/src/idl/music_player.json"
+
 
 [workspace]
 types = "../../frontend/src/"
+
+[test.validator]
+rpc_port = 8080

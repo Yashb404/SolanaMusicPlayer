@@ -1,0 +1,482 @@
+{
+  "address": "B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie",
+  "metadata": {
+    "name": "music_player",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "add_track_to_playlist",
+      "discriminator": [
+        40,
+        122,
+        120,
+        88,
+        218,
+        58,
+        138,
+        92
+      ],
+      "accounts": [
+        {
+          "name": "playlist",
+          "writable": true
+        },
+        {
+          "name": "track"
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "playlist"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_playlist",
+      "discriminator": [
+        12,
+        221,
+        173,
+        119,
+        26,
+        182,
+        58,
+        49
+      ],
+      "accounts": [
+        {
+          "name": "playlist",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "playlist_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "playlist_id",
+          "type": "u64"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "description",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "initialize_user",
+      "discriminator": [
+        111,
+        17,
+        185,
+        250,
+        60,
+        122,
+        38,
+        254
+      ],
+      "accounts": [
+        {
+          "name": "user_profile",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  45,
+                  112,
+                  114,
+                  111,
+                  102,
+                  105,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "username",
+          "type": "string"
+        },
+        {
+          "name": "email",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "remove_track_from_playlist",
+      "discriminator": [
+        246,
+        227,
+        91,
+        80,
+        71,
+        221,
+        68,
+        3
+      ],
+      "accounts": [
+        {
+          "name": "playlist",
+          "writable": true
+        },
+        {
+          "name": "track"
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "playlist"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "upload_track",
+      "discriminator": [
+        166,
+        134,
+        174,
+        253,
+        216,
+        183,
+        206,
+        193
+      ],
+      "accounts": [
+        {
+          "name": "track",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  99,
+                  107
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "track_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "track_id",
+          "type": "u64"
+        },
+        {
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "name": "artist",
+          "type": "string"
+        },
+        {
+          "name": "genre",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Playlist",
+      "discriminator": [
+        132,
+        146,
+        3,
+        250,
+        182,
+        54,
+        96,
+        213
+      ]
+    },
+    {
+      "name": "Track",
+      "discriminator": [
+        148,
+        45,
+        9,
+        235,
+        14,
+        15,
+        36,
+        159
+      ]
+    },
+    {
+      "name": "UserProfile",
+      "discriminator": [
+        32,
+        37,
+        119,
+        205,
+        179,
+        180,
+        13,
+        194
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized action"
+    },
+    {
+      "code": 6001,
+      "name": "PlaylistNotFound",
+      "msg": "Playlist not found"
+    },
+    {
+      "code": 6002,
+      "name": "TrackNotFound",
+      "msg": "Track not found"
+    },
+    {
+      "code": 6003,
+      "name": "UserProfileNotFound",
+      "msg": "User profile not found"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidInputData",
+      "msg": "Invalid input data"
+    },
+    {
+      "code": 6005,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds for transaction"
+    },
+    {
+      "code": 6006,
+      "name": "OperationNotSupported",
+      "msg": "Operation not supported"
+    },
+    {
+      "code": 6007,
+      "name": "UsernameTooLong",
+      "msg": "Username exceeds maximum allowed length"
+    },
+    {
+      "code": 6008,
+      "name": "EmailTooLong",
+      "msg": "Email exceeds maximum allowed length"
+    },
+    {
+      "code": 6009,
+      "name": "TrackTitleTooLong",
+      "msg": "Track title exceeds maximum allowed length"
+    },
+    {
+      "code": 6010,
+      "name": "ArtistTooLong",
+      "msg": "Artist name exceeds maximum allowed length"
+    },
+    {
+      "code": 6011,
+      "name": "GenreTooLong",
+      "msg": "Genre exceeds maximum allowed length"
+    }
+  ],
+  "types": [
+    {
+      "name": "Playlist",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "name": "tracks",
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Track",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "title",
+            "type": "string"
+          },
+          {
+            "name": "artist",
+            "type": "string"
+          },
+          {
+            "name": "genre",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserProfile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "username",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "updated_at",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}

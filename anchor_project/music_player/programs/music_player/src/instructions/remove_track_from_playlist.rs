@@ -14,11 +14,11 @@ pub struct DeleteTrackFromPlaylist<'info> {
     pub owner: Signer<'info>,
 }
 
+#[inline(never)]
 pub fn handler(ctx: Context<DeleteTrackFromPlaylist>) -> Result<()> {
     let playlist = &mut ctx.accounts.playlist;
-    let track_id = ctx.accounts.track.id;  // Get the u64 track ID
+    let track_id = ctx.accounts.track.id;
 
-    // Find and remove the track ID from the playlist
     if let Some(pos) = playlist.tracks.iter().position(|&id| id == track_id) {
         playlist.tracks.remove(pos);
         playlist.updated_at = Clock::get()?.unix_timestamp;

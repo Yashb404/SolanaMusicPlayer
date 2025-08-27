@@ -3,79 +3,92 @@ import { Program, AnchorProvider, web3, BN, Idl } from '@coral-xyz/anchor';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { useMemo } from 'react';
 
-// Import your IDL - fixed path to the correct location
-import idl from '../../anchor_project/music_player/target/idl/music_player.json';
-// Your program ID from Anchor.toml
-const PROGRAM_ID = new PublicKey("B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie");
+// Import your IDL
+import idl from '../idl/music_player.json';
+// Import the generated types from target/types
+import type { MusicPlayer } from '@/music_player';
 
 // Network configuration
-const NETWORK = clusterApiUrl('devnet');
+const RPC_ENDPOINT = clusterApiUrl('devnet');
 
-export interface MusicPlayerProgram extends Program {
+export interface MusicPlayerProgram extends Program<MusicPlayer> {
   // Add any specific types if needed
 }
 
 export const useMusicPlayerProgram = () => {
   const { connection } = useConnection();
-  const { publicKey, signTransaction, signAllTransactions } = useWallet();
+  const wallet = useWallet();
 
-  return useMemo(() => {
-    try {
-      if (!publicKey || !signTransaction || !signAllTransactions) {
-        return null;
-      }
+  const provider = useMemo(() => {
+    if (!wallet || !connection) return null;
+    
+    const anchorWallet = {
+      publicKey: wallet.publicKey!,
+      signTransaction: wallet.signTransaction!,
+      // check for optional method
+      signAllTransactions: wallet.signAllTransactions ?? undefined,
+    };
 
-      const commitment: Commitment = 'processed';
-      const provider = new AnchorProvider(
-        connection,
-        { publicKey, signTransaction, signAllTransactions },
-        { commitment }
-      );
+    return new AnchorProvider(
+      connection,
+      anchorWallet as any,
+      { commitment: 'processed' as Commitment }
+    );
+  }, [wallet, connection]);
 
-      // Fixed: Program constructor parameters should be (idl, provider) for Anchor 0.31.1+
-      const program = new Program(idl as Idl, provider) as MusicPlayerProgram;
+  const program = useMemo(() => {
+    if (!provider) return null;
+    
+    // ✅ FIXED: Use the generated MusicPlayer type for full type safety
+    return new Program<MusicPlayer>(idl as MusicPlayer, provider) as MusicPlayerProgram;
+  }, [provider]);
 
-      return { program, provider };
-    } catch (error) {
-      console.error('Error initializing Solana program:', error);
-      return null;
-    }
-  }, [connection, publicKey, signTransaction, signAllTransactions]);
+  return { program, provider };
 };
 
-// Helper functions for common operations
+// Helper function to derive PDAs
 export const derivePDA = (seeds: (string | Buffer | PublicKey)[]) => {
-  // Convert all seeds to Buffer to fix type issues
-  const bufferSeeds = seeds.map(seed => {
-    if (typeof seed === 'string') {
-      return Buffer.from(seed);
-    } else if (seed instanceof PublicKey) {
-      return seed.toBuffer();
-    }
+  // ✅ FIXED: Get programId from the IDL instead of hardcoded constant
+  const programId = new PublicKey(idl.address);
+  
+  const seedBuffers = seeds.map(seed => {
+    if (typeof seed === 'string') return Buffer.from(seed);
+    if (seed instanceof PublicKey) return seed.toBuffer();
     return seed;
   });
-  return PublicKey.findProgramAddressSync(bufferSeeds, PROGRAM_ID);
+  
+  return PublicKey.findProgramAddressSync(seedBuffers, programId);
 };
 
+// Helper function to create track PDA
 export const createTrackPDA = (owner: PublicKey, trackId: BN) => {
-  return derivePDA([
-    Buffer.from("track"),
-    owner.toBuffer(),
-    trackId.toBuffer('le', 8)
-  ]);
+  // ✅ FIXED: Get programId from the IDL
+  const programId = new PublicKey(idl.address);
+  
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("track"), owner.toBuffer(), trackId.toBuffer('le', 8)],
+    programId
+  );
 };
 
+// Helper function to create playlist PDA
 export const createPlaylistPDA = (owner: PublicKey, playlistId: BN) => {
-  return derivePDA([
-    Buffer.from("playlist"),
-    owner.toBuffer(),
-    playlistId.toBuffer('le', 8)
-  ]);
+  // ✅ FIXED: Get programId from the IDL
+  const programId = new PublicKey(idl.address);
+  
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("playlist"), owner.toBuffer(), playlistId.toBuffer('le', 8)],
+    programId
+  );
 };
 
+// Helper function to create user profile PDA
 export const createUserProfilePDA = (owner: PublicKey) => {
-  return derivePDA([
-    Buffer.from("user-profile"),
-    owner.toBuffer()
-  ]);
+  // ✅ FIXED: Get programId from the IDL
+  const programId = new PublicKey(idl.address);
+  
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("user-profile"), owner.toBuffer()],
+    programId
+  );
 };
