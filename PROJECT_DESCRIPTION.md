@@ -164,6 +164,9 @@ Comprehensive testing approach covering happy paths, unhappy paths, and edge cas
 
 ### Running Tests
 ```bash
+#install node modules
+npm install
+
 # Run all tests
 anchor test
 
