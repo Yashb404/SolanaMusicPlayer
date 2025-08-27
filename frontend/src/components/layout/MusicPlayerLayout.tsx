@@ -45,6 +45,53 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // UI-only hide/restore for tracks (persisted per wallet)
+  const [hiddenTrackIds, setHiddenTrackIds] = useState<Set<string>>(new Set());
+  const [showHidden, setShowHidden] = useState(false);
+
+  const storageKey = provider?.wallet?.publicKey
+    ? `hiddenTracks:${provider.wallet.publicKey.toBase58()}`
+    : null;
+
+  useEffect(() => {
+    if (!storageKey) return;
+    try {
+      const raw = localStorage.getItem(storageKey);
+      const ids = raw ? (JSON.parse(raw) as string[]) : [];
+      setHiddenTrackIds(new Set(ids));
+    } catch {
+      // FIXME: could surface a toast if needed
+      setHiddenTrackIds(new Set());
+    }
+  }, [storageKey]);
+
+  const saveHidden = (next: Set<string>) => {
+    if (!storageKey) return;
+    localStorage.setItem(storageKey, JSON.stringify([...next]));
+  };
+
+  const hideTrack = (id: string) => {
+    setHiddenTrackIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      saveHidden(next);
+      return next;
+    });
+  };
+
+  const restoreTrack = (id: string) => {
+    setHiddenTrackIds(prev => {
+      const next = new Set(prev);
+      next.delete(id);
+      saveHidden(next);
+      return next;
+    });
+  };
+
+  const isHidden = (id: string) => hiddenTrackIds.has(id);
+  const visibleTracks = showHidden ? tracks : tracks.filter(t => !hiddenTrackIds.has(t.id));
+
+
   const { play } = usePlayer();
 
   // ✅ REAL SOLANA CALL: Create playlist on-chain
@@ -156,6 +203,47 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
     }
   };
 
+  const addTrackToPlaylist = async (playlistIdStr: string, trackIdStr: string) => {
+    if (!program || !provider || !connected) return;
+
+    try {
+      setIsLoading(true);
+      const playlistId = new BN(playlistIdStr);
+      const trackId = new BN(trackIdStr);
+
+      const [playlistPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("playlist"), provider.wallet.publicKey.toBuffer(), playlistId.toArrayLike(Buffer, "le", 8)],
+        program.programId
+      );
+      const [trackPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("track"), provider.wallet.publicKey.toBuffer(), trackId.toArrayLike(Buffer, "le", 8)],
+        program.programId
+      );
+
+      await program.methods
+        .addTrackToPlaylist()
+        .accounts({
+          playlist: playlistPda,
+          track: trackPda,
+        })
+        .rpc({ skipPreflight: true, commitment: "confirmed" });
+
+      // re-fetch updated playlist to refresh count
+      const updated = await program.account.playlist.fetch(playlistPda);
+      setPlaylists(prev =>
+        prev.map(p => (p.id === playlistIdStr ? {
+          id: updated.id.toString(),
+          name: updated.name,
+          tracks: (updated.tracks || []).map((t: any) => t.toString()),
+        } : p))
+      );
+    } catch (e) {
+      console.error("Failed to add track to playlist:", e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
     // TODO: move to a shared utils file if reused elsewhere
     const mapTrackAccount = (t: any) => ({
       id: t.id.toString(),
@@ -167,6 +255,7 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
       owner: t.owner.toBase58(),
       createdAt: Number(t.createdAt),
     });
+    
   
     // Fetch my tracks from chain
     useEffect(() => {
@@ -264,28 +353,70 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
             <div className="animate-fade-in">
               {/* Add track display here */}
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-4">Your Tracks</h2>
-                {tracks.length === 0 ? (
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-2xl font-bold">Your Tracks</h2>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={showHidden}
+                      onChange={(e) => setShowHidden(e.target.checked)}
+                    />
+                    Show hidden
+                  </label>
+                </div>
+                {visibleTracks.length === 0 ? (
                   <p className="text-muted-foreground">No tracks uploaded yet. Upload your first track!</p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {tracks.map((track) => (
-                      <div key={track.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold">{track.title}</h3>
-                            <p className="text-sm text-muted-foreground">{track.artist}</p>
+                    {visibleTracks.map((track) => {
+                      const hidden = isHidden(track.id);
+                      return (
+                        <div
+                          key={track.id}
+                          className={`p-4 border rounded-lg hover:shadow-md transition-shadow ${hidden ? "opacity-60" : ""}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="font-semibold">{track.title}</h3>
+                              <p className="text-sm text-muted-foreground">{track.artist}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button 
+                                size="sm" 
+                                onClick={() => playTrack(track)}
+                                className="ml-2"
+                              >
+                                ▶️ Play
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => (hidden ? restoreTrack(track.id) : hideTrack(track.id))}
+                                title={hidden ? "Restore to library" : "Hide from library"}
+                              >
+                                {hidden ? "Restore" : "Hide"}
+                              </Button>
+                              <select
+                                className="text-sm rounded-md border border-border bg-background text-foreground px-2 py-1 hover:bg-accent hover:text-accent-foreground transition-colors"
+                                onChange={(e) => {
+                                  const pid = e.target.value;
+                                  if (pid) addTrackToPlaylist(pid, track.id);
+                                  e.currentTarget.selectedIndex = 0;
+                                }}
+                                defaultValue=""
+                              >
+                                <option value="" disabled className="bg-background">Add to playlist…</option>
+                                {playlists.map(p => (
+                                  <option key={p.id} value={p.id} className="bg-background">
+                                    {p.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
-                          <Button 
-                            size="sm" 
-                            onClick={() => playTrack(track)}
-                            className="ml-2"
-                          >
-                            ▶️ Play
-                          </Button>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>

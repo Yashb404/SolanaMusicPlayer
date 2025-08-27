@@ -14,6 +14,7 @@ import Playlist from "./pages/Playlist";
 import NotFound from "./pages/NotFound";
 import { PlayerProvider } from "@/components/music/PlayerContext";
 import { PlayerBar } from "@/components/music/PlayerBar";
+import { MusicPlayerLayout } from "@/components/layout/MusicPlayerLayout";
 
 const queryClient = new QueryClient();
 
@@ -53,7 +54,14 @@ export function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/library" element={<Index />} />
-                <Route path="/playlist/:id" element={<Playlist />} />
+                <Route
+                  path="/playlist/:id"
+                  element={
+                    <MusicPlayerLayout>
+                      <Playlist />
+                    </MusicPlayerLayout>
+                  }
+                />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

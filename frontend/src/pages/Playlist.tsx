@@ -1,203 +1,107 @@
-import { useState } from "react";
-import { useParams, Navigate } from "react-router-dom";
-import { MusicPlayerLayout } from "@/components/layout/MusicPlayerLayout";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { BN } from "@coral-xyz/anchor";
+import { PublicKey } from "@solana/web3.js";
+import { useMusicPlayerProgram } from "@/lib/solana-program";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Trash2, Music } from "lucide-react";
+import { usePlayer } from "@/components/music/PlayerContext";
 
-interface Track {
+type UiTrack = {
   id: string;
   title: string;
   artist: string;
-  coverArt: string;
   audioFile: string;
-}
-
-interface Playlist {
-  id: string;
-  name: string;
-  tracks: Track[];
-}
-
-const Playlist = () => {
-  const { id } = useParams<{ id: string }>();
-  
-  // Mock data - in a real app this would come from state management or API
-  const [playlists, setPlaylists] = useState<Playlist[]>([
-    { 
-      id: "1", 
-      name: "My Favorites", 
-      tracks: [
-        {
-          id: "1",
-          title: "Digital Dreams",
-          artist: "CryptoBeats",
-          coverArt: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop",
-          audioFile: ""
-        }
-      ] 
-    },
-    { 
-      id: "2", 
-      name: "Chill Vibes", 
-      tracks: [
-        {
-          id: "2", 
-          title: "Blockchain Rhapsody",
-          artist: "NFT Symphony",
-          coverArt: "https://images.unsplash.com/photo-1571974599782-87624638275e?w=300&h=300&fit=crop",
-          audioFile: ""
-        },
-        {
-          id: "3",
-          title: "Solana Sunset",
-          artist: "Web3 Vibes",
-          coverArt: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=300&h=300&fit=crop",
-          audioFile: ""
-        }
-      ] 
-    }
-  ]);
-
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-
-  const playlist = playlists.find(p => p.id === id);
-  
-  if (!playlist) {
-    return <Navigate to="/" replace />;
-  }
-
-  const handleRemoveFromPlaylist = (trackId: string) => {
-    setPlaylists(prev => prev.map(p => {
-      if (p.id === id) {
-        return { ...p, tracks: p.tracks.filter(t => t.id !== trackId) };
-      }
-      return p;
-    }));
-  };
-
-  const handlePlay = (track: Track) => {
-    setCurrentTrack(currentTrack?.id === track.id ? null : track);
-  };
-
-  const totalDuration = playlist.tracks.length * 3.5; // Mock duration calculation
-
-  return (
-    <MusicPlayerLayout>
-      <div className="space-y-8">
-        {/* Playlist Header */}
-        <div className="flex items-end gap-6">
-          <div className="w-48 h-48 bg-gradient-to-br from-primary/30 to-accent/30 rounded-xl flex items-center justify-center shadow-elevated">
-            <Music className="w-20 h-20 text-foreground/60" />
-          </div>
-          
-          <div className="flex-1 space-y-4">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
-                Playlist
-              </p>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                {playlist.name}
-              </h1>
-            </div>
-            
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <span>{playlist.tracks.length} tracks</span>
-              <span>•</span>
-              <span>{Math.floor(totalDuration / 60)}h {Math.round(totalDuration % 60)}m</span>
-            </div>
-
-            {playlist.tracks.length > 0 && (
-              <Button 
-                size="lg"
-                className="bg-gradient-primary hover:opacity-90 text-primary-foreground border-0 shadow-glow"
-                onClick={() => handlePlay(playlist.tracks[0])}
-              >
-                <Play className="w-5 h-5 mr-2" />
-                Play All
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Track List */}
-        {playlist.tracks.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Music className="w-12 h-12 text-muted-foreground" />
-            </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">
-              This playlist is empty
-            </h3>
-            <p className="text-muted-foreground">
-              Add some tracks to get started!
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm font-medium text-muted-foreground border-b border-border">
-              <div className="col-span-1">#</div>
-              <div className="col-span-6">Title</div>
-              <div className="col-span-3">Artist</div>
-              <div className="col-span-2">Actions</div>
-            </div>
-            
-            {playlist.tracks.map((track, index) => (
-              <div
-                key={track.id}
-                className="track-hover grid grid-cols-12 gap-4 px-4 py-3 rounded-lg group"
-              >
-                <div className="col-span-1 flex items-center">
-                  <div className="w-8 h-8 flex items-center justify-center">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-8 h-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => handlePlay(track)}
-                    >
-                      {currentTrack?.id === track.id ? (
-                        <Pause className="w-4 h-4" />
-                      ) : (
-                        <Play className="w-4 h-4" />
-                      )}
-                    </Button>
-                    <span className="text-muted-foreground group-hover:hidden">
-                      {index + 1}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="col-span-6 flex items-center gap-3">
-                  <img
-                    src={track.coverArt}
-                    alt={track.title}
-                    className="w-10 h-10 rounded object-cover"
-                  />
-                  <div>
-                    <p className="font-medium text-foreground">{track.title}</p>
-                  </div>
-                </div>
-                
-                <div className="col-span-3 flex items-center">
-                  <p className="text-muted-foreground">{track.artist}</p>
-                </div>
-                
-                <div className="col-span-2 flex items-center justify-end">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-8 h-8 p-0 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleRemoveFromPlaylist(track.id)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </MusicPlayerLayout>
-  );
+  coverArt: string;
 };
 
-export default Playlist;
+export default function Playlist() {
+  const { id } = useParams();
+  const { program, provider } = useMusicPlayerProgram();
+  const { play } = usePlayer();
+
+  const [name, setName] = useState<string>("");
+  const [desc, setDesc] = useState<string>("");
+  const [tracks, setTracks] = useState<UiTrack[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // TODO: extract mapping util if reused elsewhere
+  const mapTrackAccount = (t: any): UiTrack => ({
+    id: t.id.toString(),
+    title: t.title,
+    artist: t.artist,
+    audioFile: t.uri,
+    coverArt: "ipfs://placeholder", // TODO: wire real cover art when stored
+  });
+
+  useEffect(() => {
+    const run = async () => {
+      if (!id || !program || !provider?.wallet?.publicKey) return;
+      try {
+        setLoading(true);
+
+        // derive playlist PDA from owner + playlistId
+        const playlistId = new BN(id);
+        const [playlistPda] = PublicKey.findProgramAddressSync(
+          [Buffer.from("playlist"), provider.wallet.publicKey.toBuffer(), playlistId.toArrayLike(Buffer, "le", 8)],
+          program.programId
+        );
+
+        const playlist = await program.account.playlist.fetch(playlistPda);
+        setName(playlist.name as string);
+        setDesc(playlist.description as string);
+
+        const trackIds: BN[] = (playlist.tracks || []) as BN[];
+        if (trackIds.length === 0) {
+          setTracks([]);
+          return;
+        }
+
+        // fetch each track account by its PDA
+        const fetched: UiTrack[] = [];
+        for (const tId of trackIds) {
+          const [trackPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("track"), provider.wallet.publicKey.toBuffer(), tId.toArrayLike(Buffer, "le", 8)],
+            program.programId
+          );
+          const tAcc = await program.account.track.fetch(trackPda);
+          fetched.push(mapTrackAccount(tAcc));
+        }
+        setTracks(fetched);
+      } catch (e) {
+        console.error("Failed to load playlist:", e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    run();
+  }, [id, program, provider]);
+
+  if (loading) return <div className="p-6">Loading…</div>;
+
+  return (
+    <div className="p-6 space-y-4">
+      <div>
+        <h2 className="text-2xl font-bold">{name || "Playlist"}</h2>
+        {desc ? <p className="text-sm text-muted-foreground mt-1">{desc}</p> : null}
+      </div>
+
+      {tracks.length === 0 ? (
+        <p className="text-muted-foreground">No tracks in this playlist yet.</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {tracks.map((t) => (
+            <div key={t.id} className="p-4 border rounded-lg hover:shadow-sm transition">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{t.title}</div>
+                  <div className="text-sm text-muted-foreground truncate">{t.artist}</div>
+                </div>
+                <Button size="sm" onClick={() => play(t)}>▶️ Play</Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
