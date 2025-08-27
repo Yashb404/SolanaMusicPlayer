@@ -8,11 +8,16 @@ skip-lint = false
 [programs.localnet]
 music_player = "B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie"
 
+# Add a mapping for devnet (fill PROGRAM_ID after deploy)
+[programs.devnet]
+music_player = "B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie"
+
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
