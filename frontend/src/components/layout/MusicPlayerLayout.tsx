@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Music, Plus } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
@@ -11,6 +11,7 @@ import { MusicSidebar } from "./MusicSidebar";
 import { CreatePlaylistModal } from "../modals/CreatePlaylistModal";
 import { UploadTrackModal } from "../modals/UploadTrackModal";
 import { useMusicPlayerProgram } from "../../lib/solana-program";
+import { AudioPlayerDialog } from "../music/AudioPlayerDialog";
 
 
 
@@ -68,7 +69,7 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
           
           signer: provider.wallet.publicKey,
         })
-        .rpc();
+        .rpc({ skipPreflight: true, commitment: "confirmed" });
 
       // ✅ FIXED: Use capitalized account name as per your IDL
       const playlistAccount = await program.account.playlist.fetch(playlistPda);
@@ -119,36 +120,78 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
       const coverUri = trackData.coverArt ? `ipfs://${trackData.coverArt}` : "ipfs://placeholder";
 
       // Call the Solana program
-      await program.methods
+      const sig = await program.methods
         .uploadTrack(trackId, trackData.title, trackData.artist, trackData.genre, audioUri)
         .accounts({
-          // ✅ This should work now with proper types
+          // ✅ inferred PDAs; only signer needed
           signer: provider.wallet.publicKey,
         })
-        .rpc();
+        .rpc({ skipPreflight: true, commitment: "confirmed" });
 
-      // ✅ FIXED: Use capitalized account name as per your IDL
+      console.log("Tx:", sig, "Explorer:", `https://explorer.solana.com/tx/${sig}?cluster=devnet`);
+
+      // ✅ Fetch the just-created account from chain for canonical data
       const trackAccount = await program.account.track.fetch(trackPda);
-      
-      // Update local state with on-chain data
-      const newTrack: Track = { // ✅ Fix type name to uppercase Track
-        id: trackAccount.id.toString(),
-        title: trackAccount.title,
-        artist: trackAccount.artist,
-        coverArt: coverUri,
-        audioFile: audioUri,
-      };
-      
-      setTracks(prev => [...prev, newTrack]);
-      console.log("✅ Track uploaded on-chain:", trackAccount);
+      const newTrack = mapTrackAccount(trackAccount);
+      // TODO: if/when coverArt is stored on-chain, remove this override
+      newTrack.coverArt = coverUri;
+      setTracks(prev => [newTrack, ...prev]);
       
     } catch (error) {
       console.error("❌ Failed to upload track:", error);
-      // TODO: Add proper error handling/toast notifications
+      try {
+        // Attempt to print simulation logs if available (Anchor SendTransactionError)
+        const anyErr: any = error;
+        if (anyErr && typeof anyErr.getLogs === 'function' && provider?.connection) {
+          const logs = await anyErr.getLogs(provider.connection);
+          console.error("🔍 Transaction logs:", logs);
+        }
+      } catch (e) {
+        console.error("Failed to fetch logs:", e);
+      }
+      // TODO: Surface user-friendly toast with actionable hint (e.g., airdrop SOL on devnet)
     } finally {
       setIsLoading(false);
     }
   };
+
+    // TODO: move to a shared utils file if reused elsewhere
+    const mapTrackAccount = (t: any) => ({
+      id: t.id.toString(),
+      title: t.title,
+      artist: t.artist,
+      genre: t.genre,
+      audioFile: t.uri,
+      coverArt: "ipfs://placeholder", // TODO: wire real coverArt when available
+      owner: t.owner.toBase58(),
+      createdAt: Number(t.createdAt),
+    });
+  
+    // Fetch my tracks from chain
+    useEffect(() => {
+      const run = async () => {
+        if (!connected || !program || !provider?.wallet?.publicKey) return;
+  
+        try {
+          setIsLoading(true);
+          const owner = provider.wallet.publicKey.toBase58();
+          // owner offset = 8 (discriminator) + 8 (id) = 16
+          const accounts = await program.account.track.all([
+            { memcmp: { offset: 16, bytes: owner } },
+          ]);
+  
+          const mapped = accounts.map(a => mapTrackAccount(a.account));
+          setTracks(mapped);
+        } catch (e) {
+          console.error("Failed to fetch tracks:", e);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+      run();
+      // re-fetch when wallet or program changes
+    }, [connected, program, provider]);
 
   const playTrack = (track: Track) => {
     setCurrentTrack(track);
@@ -237,6 +280,17 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
           isOpen={showUploadTrack}
           onClose={() => setShowUploadTrack(false)}
           onUploadTrack={onUploadTrack}
+        />
+
+        <AudioPlayerDialog
+          open={!!currentTrack}
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsPlaying(false);
+              setCurrentTrack(null);
+            }
+          }}
+          track={currentTrack}
         />
    
       </div>

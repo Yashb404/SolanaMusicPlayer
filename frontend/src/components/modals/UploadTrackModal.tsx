@@ -55,6 +55,7 @@ export function UploadTrackModal({ isOpen, onClose, onUploadTrack }: UploadTrack
     } catch (error) {
       console.error('Upload failed:', error);
       // TODO: Add error notification
+      
     } finally {
       setIsUploading(false);
     }
