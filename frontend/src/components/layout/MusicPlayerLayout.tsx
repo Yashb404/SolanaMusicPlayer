@@ -258,40 +258,68 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
     });
     
   
-    // Fetch my tracks from chain
-    useEffect(() => {
-      const run = async () => {
-        if (!connected || !program || !provider?.wallet?.publicKey) return;
-  
-        try {
-          setIsLoading(true);
-          const owner = provider.wallet.publicKey.toBase58();
-          // owner offset = 8 (discriminator) + 8 (id) = 16
+  // Add rate limiting state
+  const [lastFetchTime, setLastFetchTime] = useState(0);
+  const FETCH_COOLDOWN = 2000; // 2 seconds between fetches
+
+  // Rate-limited fetch function
+  const fetchWithRateLimit = async (fetchFn: () => Promise<any>, type: string) => {
+    const now = Date.now();
+    if (now - lastFetchTime < FETCH_COOLDOWN) {
+      console.log(`Rate limited: ${type} fetch skipped`);
+      return;
+    }
+    
+    try {
+      setLastFetchTime(now);
+      return await fetchFn();
+    } catch (error: any) {
+      if (error?.message?.includes('429')) {
+        console.log(`Rate limited for ${type}, will retry later`);
+        // Don't update lastFetchTime so we can retry
+        return;
+      }
+      throw error;
+    }
+  };
+
+  // Fetch my tracks from chain with rate limiting
+  useEffect(() => {
+    const run = async () => {
+      if (!connected || !program || !provider?.wallet?.publicKey) return;
+
+      try {
+        setIsLoading(true);
+        const owner = provider.wallet.publicKey.toBase58();
+        
+        await fetchWithRateLimit(async () => {
           const accounts = await program.account.track.all([
             { memcmp: { offset: 16, bytes: owner } },
           ]);
-  
           const mapped = accounts.map(a => mapTrackAccount(a.account));
           setTracks(mapped);
-        } catch (e) {
-          console.error("Failed to fetch tracks:", e);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-  
-      run();
-      // re-fetch when wallet or program changes
-    }, [connected, program, provider]);
+        }, 'tracks');
 
-    // Fetch my playlists from chain
-    useEffect(() => {
-      const run = async () => {
-        if (!connected || !program || !provider?.wallet?.publicKey) return;
-        try {
-          setIsLoading(true);
-          const owner = provider.wallet.publicKey.toBase58();
-          // owner offset for Playlist = 8(discriminator)+8(id)=16
+      } catch (e) {
+        console.error("Failed to fetch tracks:", e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    run();
+  }, [connected, program, provider, lastFetchTime]);
+
+  // Fetch my playlists from chain with rate limiting
+  useEffect(() => {
+    const run = async () => {
+      if (!connected || !program || !provider?.wallet?.publicKey) return;
+      
+      try {
+        setIsLoading(true);
+        const owner = provider.wallet.publicKey.toBase58();
+        
+        await fetchWithRateLimit(async () => {
           const accounts = await program.account.playlist.all([
             { memcmp: { offset: 16, bytes: owner } },
           ]);
@@ -301,14 +329,17 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
             tracks: (a.account.tracks || []).map((t: any) => t.toString()),
           } as Playlist));
           setPlaylists(mapped);
-        } catch (e) {
-          console.error('Failed to fetch playlists:', e);
-        } finally {
-          setIsLoading(false);
-        }
-      };
-      run();
-    }, [connected, program, provider]);
+        }, 'playlists');
+
+      } catch (e) {
+        console.error('Failed to fetch playlists:', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    run();
+  }, [connected, program, provider, lastFetchTime]);
 
   return (
     <SidebarProvider>

@@ -10,6 +10,8 @@ import type { MusicPlayer } from '@/music_player';
 
 // Network configuration
 const RPC_ENDPOINT = clusterApiUrl('devnet');
+const NETWORK = clusterApiUrl('devnet'); // or try 'mainnet-beta' for better performance
+
 
 export interface MusicPlayerProgram extends Program<MusicPlayer> {
   // Add any specific types if needed
