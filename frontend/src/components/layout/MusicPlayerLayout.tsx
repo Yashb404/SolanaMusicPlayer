@@ -12,7 +12,7 @@ import { CreatePlaylistModal } from "../modals/CreatePlaylistModal";
 import { UploadTrackModal } from "../modals/UploadTrackModal";
 import { useMusicPlayerProgram } from "../../lib/solana-program";
 import { AudioPlayerDialog } from "../music/AudioPlayerDialog";
-
+import { usePlayer } from "../music/PlayerContext";
 
 
 interface Playlist {
@@ -44,6 +44,8 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
   const [showUploadTrack, setShowUploadTrack] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const { play } = usePlayer();
 
   // ✅ REAL SOLANA CALL: Create playlist on-chain
   const createPlaylist = async (name: string) => {
@@ -78,10 +80,9 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
       const newPlaylist: Playlist = {
         id: playlistAccount.id.toString(),
         name: playlistAccount.name,
-        tracks: [],
+        tracks: (playlistAccount.tracks || []).map((t: any) => t.toString()),
       };
-      
-      setPlaylists(prev => [...prev, newPlaylist]);
+      setPlaylists(prev => [newPlaylist, ...prev]);
       console.log("✅ Playlist created on-chain:", playlistAccount);
       
     } catch (error) {
@@ -193,10 +194,34 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
       // re-fetch when wallet or program changes
     }, [connected, program, provider]);
 
+    // Fetch my playlists from chain
+    useEffect(() => {
+      const run = async () => {
+        if (!connected || !program || !provider?.wallet?.publicKey) return;
+        try {
+          setIsLoading(true);
+          const owner = provider.wallet.publicKey.toBase58();
+          // owner offset for Playlist = 8(discriminator)+8(id)=16
+          const accounts = await program.account.playlist.all([
+            { memcmp: { offset: 16, bytes: owner } },
+          ]);
+          const mapped = accounts.map((a: any) => ({
+            id: a.account.id.toString(),
+            name: a.account.name as string,
+            tracks: (a.account.tracks || []).map((t: any) => t.toString()),
+          } as Playlist));
+          setPlaylists(mapped);
+        } catch (e) {
+          console.error('Failed to fetch playlists:', e);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      run();
+    }, [connected, program, provider]);
+
   const playTrack = (track: Track) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
-    // TODO: Implement actual audio playback using track.audioFile
+    void play(track);
   };
 
 

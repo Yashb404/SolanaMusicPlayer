@@ -12,6 +12,8 @@ import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adap
 import Index from "./pages/Index";
 import Playlist from "./pages/Playlist";
 import NotFound from "./pages/NotFound";
+import { PlayerProvider } from "@/components/music/PlayerContext";
+import { PlayerBar } from "@/components/music/PlayerBar";
 
 const queryClient = new QueryClient();
 
@@ -39,24 +41,29 @@ const SolanaWalletProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <SolanaWalletProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/library" element={<Index />} />
-            <Route path="/playlist/:id" element={<Playlist />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </SolanaWalletProvider>
-  </QueryClientProvider>
-);
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SolanaWalletProvider>
+        <PlayerProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/library" element={<Index />} />
+                <Route path="/playlist/:id" element={<Playlist />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <PlayerBar />
+            </BrowserRouter>
+          </TooltipProvider>
+        </PlayerProvider>
+      </SolanaWalletProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;
