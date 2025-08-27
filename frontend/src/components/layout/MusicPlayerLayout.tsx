@@ -4,14 +4,13 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
-
+import { fetchCoverArt } from "@/lib/coverArt";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { MusicSidebar } from "./MusicSidebar";
 import { CreatePlaylistModal } from "../modals/CreatePlaylistModal";
 import { UploadTrackModal } from "../modals/UploadTrackModal";
 import { useMusicPlayerProgram } from "../../lib/solana-program";
-import { AudioPlayerDialog } from "../music/AudioPlayerDialog";
 import { usePlayer } from "../music/PlayerContext";
 
 
@@ -42,12 +41,10 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [showUploadTrack, setShowUploadTrack] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [showHidden, setShowHidden] = useState(false);
 
   // UI-only hide/restore for tracks (persisted per wallet)
   const [hiddenTrackIds, setHiddenTrackIds] = useState<Set<string>>(new Set());
-  const [showHidden, setShowHidden] = useState(false);
 
   const storageKey = provider?.wallet?.publicKey
     ? `hiddenTracks:${provider.wallet.publicKey.toBase58()}`
@@ -165,8 +162,7 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
 
       // Use the IPFS CID directly - no need to upload files here
       const audioUri = `ipfs://${trackData.ipfsCid}`;
-      const coverUri = trackData.coverArt ? `ipfs://${trackData.coverArt}` : "ipfs://placeholder";
-
+      
       // Call the Solana program
       const sig = await program.methods
         .uploadTrack(trackId, trackData.title, trackData.artist, trackData.genre, audioUri)
@@ -180,9 +176,14 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
 
       // ✅ Fetch the just-created account from chain for canonical data
       const trackAccount = await program.account.track.fetch(trackPda);
+      // Minimal: auto-fetch cover art if not provided
+      let coverUri = trackData.coverArt ? `ipfs://${trackData.coverArt}` : "ipfs://placeholder";
+      if (!trackData.coverArt) {
+        const fetched = await fetchCoverArt(trackData.artist, trackData.title); // best-effort
+        if (fetched) coverUri = fetched; // use https URL from Spotify via album-art
+      }
       const newTrack = mapTrackAccount(trackAccount);
-      // TODO: if/when coverArt is stored on-chain, remove this override
-      newTrack.coverArt = coverUri;
+      newTrack.coverArt = coverUri; // set fetched (or user-provided) cover art for UI
       setTracks(prev => [newTrack, ...prev]);
       
     } catch (error) {
@@ -309,11 +310,6 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
       run();
     }, [connected, program, provider]);
 
-  const playTrack = (track: Track) => {
-    void play(track);
-  };
-
-
   return (
     <SidebarProvider>
       <div className="min-h-screen w-full bg-background flex">
@@ -351,75 +347,6 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
 
           <main className="flex-1 p-6">
             <div className="animate-fade-in">
-              {/* Add track display here */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-2xl font-bold">Your Tracks</h2>
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={showHidden}
-                      onChange={(e) => setShowHidden(e.target.checked)}
-                    />
-                    Show hidden
-                  </label>
-                </div>
-                {visibleTracks.length === 0 ? (
-                  <p className="text-muted-foreground">No tracks uploaded yet. Upload your first track!</p>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {visibleTracks.map((track) => {
-                      const hidden = isHidden(track.id);
-                      return (
-                        <div
-                          key={track.id}
-                          className={`p-4 border rounded-lg hover:shadow-md transition-shadow ${hidden ? "opacity-60" : ""}`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h3 className="font-semibold">{track.title}</h3>
-                              <p className="text-sm text-muted-foreground">{track.artist}</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Button 
-                                size="sm" 
-                                onClick={() => playTrack(track)}
-                                className="ml-2"
-                              >
-                                ▶️ Play
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => (hidden ? restoreTrack(track.id) : hideTrack(track.id))}
-                                title={hidden ? "Restore to library" : "Hide from library"}
-                              >
-                                {hidden ? "Restore" : "Hide"}
-                              </Button>
-                              <select
-                                className="text-sm rounded-md border border-border bg-background text-foreground px-2 py-1 hover:bg-accent hover:text-accent-foreground transition-colors"
-                                onChange={(e) => {
-                                  const pid = e.target.value;
-                                  if (pid) addTrackToPlaylist(pid, track.id);
-                                  e.currentTarget.selectedIndex = 0;
-                                }}
-                                defaultValue=""
-                              >
-                                <option value="" disabled className="bg-background">Add to playlist…</option>
-                                {playlists.map(p => (
-                                  <option key={p.id} value={p.id} className="bg-background">
-                                    {p.name}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
               {children}
             </div>
           </main>
@@ -436,17 +363,6 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
           isOpen={showUploadTrack}
           onClose={() => setShowUploadTrack(false)}
           onUploadTrack={onUploadTrack}
-        />
-
-        <AudioPlayerDialog
-          open={!!currentTrack}
-          onOpenChange={(open) => {
-            if (!open) {
-              setIsPlaying(false);
-              setCurrentTrack(null);
-            }
-          }}
-          track={currentTrack}
         />
    
       </div>

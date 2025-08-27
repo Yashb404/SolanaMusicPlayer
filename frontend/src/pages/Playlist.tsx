@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { useMusicPlayerProgram } from "@/lib/solana-program";
@@ -24,6 +24,8 @@ export default function Playlist() {
   const [tracks, setTracks] = useState<UiTrack[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const playlistId = useMemo(() => (id ? new BN(id) : null), [id]); // TODO: validate id is numeric
+
   // TODO: extract mapping util if reused elsewhere
   const mapTrackAccount = (t: any): UiTrack => ({
     id: t.id.toString(),
@@ -32,6 +34,54 @@ export default function Playlist() {
     audioFile: t.uri,
     coverArt: "ipfs://placeholder", // TODO: wire real cover art when stored
   });
+
+  // TODO: move PDA derivations to a shared util if reused elsewhere
+  const derivePlaylistPda = () => {
+    if (!provider?.wallet?.publicKey || !playlistId || !program) return null;
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("playlist"), provider.wallet.publicKey.toBuffer(), playlistId.toArrayLike(Buffer, "le", 8)],
+      program.programId
+    )[0];
+  };
+
+  const deriveTrackPda = (trackIdStr: string) => {
+    if (!provider?.wallet?.publicKey || !program) return null;
+    const tid = new BN(trackIdStr);
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("track"), provider.wallet.publicKey.toBuffer(), tid.toArrayLike(Buffer, "le", 8)],
+      program.programId
+    )[0];
+  };
+
+  const removeTrackFromPlaylist = async (trackIdStr: string) => {
+    if (!program || !provider?.wallet?.publicKey || !playlistId) return;
+
+    try {
+      setLoading(true);
+      const playlistPda = derivePlaylistPda();
+      const trackPda = deriveTrackPda(trackIdStr);
+      if (!playlistPda || !trackPda) return; // FIXME: surface a toast
+
+      await program.methods
+        .removeTrackFromPlaylist()
+        .accounts({
+          playlist: playlistPda,
+          track: trackPda,
+        })
+        .rpc({ skipPreflight: true, commitment: "confirmed" });
+
+      // Optimistic UI update
+      setTracks(prev => prev.filter(t => t.id !== trackIdStr));
+
+      // TODO: Optionally re-fetch the playlist from chain to confirm canonical state
+      // await fetchPlaylist();
+    } catch (e) {
+      console.error("Failed to remove track from playlist:", e);
+      // TODO: show toast
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const run = async () => {
@@ -97,6 +147,14 @@ export default function Playlist() {
                   <div className="text-sm text-muted-foreground truncate">{t.artist}</div>
                 </div>
                 <Button size="sm" onClick={() => play(t)}>▶️ Play</Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => void removeTrackFromPlaylist(t.id)}
+                  title="Remove from this playlist"
+                >
+                  Remove
+                </Button>
               </div>
             </div>
           ))}
