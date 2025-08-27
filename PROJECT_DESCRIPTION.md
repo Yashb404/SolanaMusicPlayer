@@ -1,6 +1,7 @@
-# Project Description
+# Music Player dApp
 
-**Deployed Frontend URL:** [TODO: Link to your deployed frontend]
+## Project Description
+A decentralized music player built on Solana that allows users to upload tracks, create playlists, and manage their music library on-chain.
 
 **Solana Program ID:** [TODO: Your deployed program's public key]
 
@@ -56,23 +57,39 @@ pub struct YourAccountName {
 ## Testing
 
 ### Test Coverage
-[TODO: Describe your testing approach and what scenarios you covered]
+Comprehensive testing approach covering happy paths, unhappy paths, and edge cases to ensure robust functionality and security.
 
 **Happy Path Tests:**
-- Test 1: [Description]
-- Test 2: [Description]
-- ...
+- **User Profile Initialization**: Tests successful user profile creation with valid username and email
+- **Track Upload**: Tests complete track upload with all required metadata (title, artist, genre, URI)
+- **Playlist Creation**: Tests playlist creation with name and description
+- **Track Management**: Tests adding and removing tracks from playlists successfully
 
 **Unhappy Path Tests:**
-- Test 1: [Description of error scenario]
-- Test 2: [Description of error scenario]
-- ...
+- **Validation Errors**: Tests username length limits and empty field handling
+- **Authorization Errors**: Tests access restrictions for playlist operations
+- **State Errors**: Tests operations on invalid states (e.g., removing from empty playlist)
+
+**Edge Case Tests:**
+- **Boundary Values**: Tests reasonable length strings and boundary conditions
+- **Special Characters**: Tests handling of special characters, emojis, and numbers in text fields
 
 ### Running Tests
 ```bash
-# Commands to run your tests
+# Run all tests
 anchor test
+
+# Run with verbose output
+anchor test --verbose
 ```
+
+### Test Results
+Tests demonstrate:
+- ✅ Proper account creation and state management
+- ✅ Correct PDA derivation and usage
+- ✅ Proper error handling and validation
+- ✅ Security constraints enforcement
+- ✅ Edge case handling
 
 ### Additional Notes for Evaluators
 

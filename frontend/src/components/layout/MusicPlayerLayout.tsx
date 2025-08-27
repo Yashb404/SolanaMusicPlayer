@@ -12,6 +12,8 @@ import { CreatePlaylistModal } from "../modals/CreatePlaylistModal";
 import { UploadTrackModal } from "../modals/UploadTrackModal";
 import { useMusicPlayerProgram } from "../../lib/solana-program";
 import { usePlayer } from "../music/PlayerContext";
+import { Buffer } from 'buffer';
+window.Buffer = Buffer;
 
 
 interface Playlist {
@@ -283,7 +285,7 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
     }
   };
 
-  // Fetch my tracks from chain with rate limiting
+  // Fetch my tracks from chain with better error handling
   useEffect(() => {
     const run = async () => {
       if (!connected || !program || !provider?.wallet?.publicKey) return;
@@ -292,25 +294,28 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
         setIsLoading(true);
         const owner = provider.wallet.publicKey.toBase58();
         
-        await fetchWithRateLimit(async () => {
-          const accounts = await program.account.track.all([
-            { memcmp: { offset: 16, bytes: owner } },
-          ]);
-          const mapped = accounts.map(a => mapTrackAccount(a.account));
-          setTracks(mapped);
-        }, 'tracks');
-
+        // Add delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const accounts = await program.account.track.all([
+          { memcmp: { offset: 16, bytes: owner } },
+        ]);
+        
+        const mapped = accounts.map(a => mapTrackAccount(a.account));
+        setTracks(mapped);
       } catch (e) {
         console.error("Failed to fetch tracks:", e);
+        // Set empty tracks on error to avoid infinite loading
+        setTracks([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     run();
-  }, [connected, program, provider, lastFetchTime]);
+  }, [connected, program, provider]);
 
-  // Fetch my playlists from chain with rate limiting
+  // Fetch my playlists from chain with better error handling
   useEffect(() => {
     const run = async () => {
       if (!connected || !program || !provider?.wallet?.publicKey) return;
@@ -319,27 +324,30 @@ export function MusicPlayerLayout({ children }: MusicPlayerLayoutProps) {
         setIsLoading(true);
         const owner = provider.wallet.publicKey.toBase58();
         
-        await fetchWithRateLimit(async () => {
-          const accounts = await program.account.playlist.all([
-            { memcmp: { offset: 16, bytes: owner } },
-          ]);
-          const mapped = accounts.map((a: any) => ({
-            id: a.account.id.toString(),
-            name: a.account.name as string,
-            tracks: (a.account.tracks || []).map((t: any) => t.toString()),
-          } as Playlist));
-          setPlaylists(mapped);
-        }, 'playlists');
-
+        // Add delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const accounts = await program.account.playlist.all([
+          { memcmp: { offset: 16, bytes: owner } },
+        ]);
+        
+        const mapped = accounts.map((a: any) => ({
+          id: a.account.id.toString(),
+          name: a.account.name as string,
+          tracks: (a.account.tracks || []).map((t: any) => t.toString()),
+        } as Playlist));
+        setPlaylists(mapped);
       } catch (e) {
         console.error('Failed to fetch playlists:', e);
+        // Set empty playlists on error to avoid infinite loading
+        setPlaylists([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     run();
-  }, [connected, program, provider, lastFetchTime]);
+  }, [connected, program, provider]);
 
   return (
     <SidebarProvider>
