@@ -35,7 +35,7 @@ The dApp provides a rich set of features that demonstrate advanced Solana develo
 The dApp provides an intuitive user experience that abstracts away blockchain complexity:
 
 #### Your wallet must be on Solana Devnet.
-#### Ensure you are connected wallet has at least some SOL available — otherwise, transactions will fail during testing. You can request free SOL from the Devnet Faucet.
+#### Ensure your connected wallet has at least some SOL available — otherwise, transactions will fail during testing. You can request free SOL from the Devnet Faucet.
 
 1. **Connect Wallet**
    - Click the "Connect Wallet" button in the top-right corner
