@@ -257,3 +257,10 @@ The comprehensive test suite demonstrates:
 
 I cannot state how much this project helped me in actually understanding how solana development works , I had never tried something like this before the Solana school and I am grateful for that. Understanding how a solana backend and frontend is connected , proper testing protocols , PDA and seeds were things that were foreign to me before this bootcamp and now I am going with alot of knowledge about these topics. 
 I will keep on working on this project and turn it into a actual viable product by changing some functionalities . It will head into a direction of a platform where you can buy music and keep it in your profile.
+
+
+## Screenshots 
+
+<img width="1919" height="938" alt="image" src="https://github.com/user-attachments/assets/5edae558-5f00-4c80-9f52-e226d445d15e" />
+<img width="559" height="611" alt="image" src="https://github.com/user-attachments/assets/77fe4be1-ae6e-4636-a873-858c4a25b9f9" />
+<img width="839" height="763" alt="image" src="https://github.com/user-attachments/assets/0d387505-e0e4-4c0e-a3b3-a80c0638da6f" />
