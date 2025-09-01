@@ -30,6 +30,7 @@ The dApp provides a rich set of features that demonstrate advanced Solana develo
 - **Secure Ownership Model**: Cryptographic verification ensures only authorized users can modify their content
 - **Persistent Data Storage**: Music collections persist across sessions and are globally accessible
 - **Rate Limiting Protection**: Built-in protection against RPC endpoint abuse with intelligent retry mechanisms
+- **Automatic Album cover fetching**: 
 
 ### How to Use the dApp
 The dApp provides an intuitive user experience that abstracts away blockchain complexity:
@@ -38,16 +39,35 @@ The dApp provides an intuitive user experience that abstracts away blockchain co
 #### Ensure your connected wallet has at least some SOL available — otherwise, transactions will fail during testing. You can request free SOL from the Devnet Faucet.
 
 1. **Connect Wallet**
-   - Click the "Connect Wallet" button in the top-right corner
-   - Select your preferred Solana wallet (Phantom, Solflare, etc.)
-   - Approve the connection to enable dApp functionality
+   - Click the **Connect Wallet** button in the top-right corner  
+   - Select your preferred Solana wallet (Phantom, Solflare, etc.)  
+   - Approve the connection to enable dApp functionality  
 
 2. **Upload Music Tracks**
-   - Click "Upload Track" button in the header
-   - Fill in track details: Title, Artist, Genre
-   - Provide IPFS CID for the audio file
-   - Optionally add cover art IPFS CID
-   - Submit transaction to store track metadata on-chain
+   - Click **Upload Track** in the header  
+   - Fill in track details: **Title, Artist, Genre**  
+   - Provide the **IPFS CID** for the audio file *(You can use [Pinata](https://pinata.cloud/))*  
+
+   <details>
+     <summary><strong>📂 Publicly available sample CIDs (click to expand)</strong></summary>
+
+     - **Danger** by JID  
+       `bafybeidoteq2nogc3cwaybnh7veyncebwrwsjv7zso5dupopvlpqwwr56a`  
+
+     - **Tunnel Vision** by Talwinder  
+       `bafybeib7h4w6gi45e6b4kyksg6ya7bra5ozydkljns2f4tqzqsltpryupe`  
+
+     - **Betty** by AJR  
+       `bafybeihjqbxmcwmnjoa2xqlt7vbsdidor7kpm6uxe7h76vvka57fxw6e5y`  
+
+     - **Origami** by Rare Occasion  
+       `bafybeiekv2vbcxpcrr5bzny4x5w5k5mzdxihcj5776shek5yksbqfaa2wu`  
+
+   </details>  
+
+   - Optionally add a **cover art IPFS CID** otherwise they will be automatically fetched via *album-art* if available  
+   - Submit the transaction to store track metadata on-chain  
+
 
 3. **Create Playlists**
    - Use the sidebar to create new playlists
