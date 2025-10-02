@@ -1,93 +1,266 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/idxPpgnz)
-![School of Solana](https://github.com/Ackee-Blockchain/school-of-solana/blob/master/.banner/banner.png?raw=true)
+# Music Player dApp
 
-## 📚Solana Program
-We are about halfway through the course, and you already have some experience with programming on Solana. It is time to create something on your own! You will be building a dApp that will serve as the culmination of everything you have learned so far. Feel free to implement whatever comes to your mind, (as long as it passes the requirements).
+## Project Description
+A decentralized music player built on Solana that allows users to upload tracks, create playlists, and manage their music library on-chain. This dApp leverages Solana's high-performance blockchain to provide a secure, decentralized platform for music enthusiasts to store metadata, organize their music collections, and share playlists while maintaining full ownership of their data.
 
-**This does not mean that the School of Solana is coming to an end just yet!** There are still several exciting lectures ahead, as well as one security related task.
+**Solana Program ID:** B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie
 
-### Task details
-This task consists of two parts:
-1. **Core of your dApp**
-    - A deployed Solana program.
-2. **Frontend**
-    - A simple frontend to interact with the dApp.
+**Deployment Link:** https://mulana.vercel.app/
 
-### Requirements
-- An Anchor program deployed on **Devnet** or **Mainnet**.
-- The Anchor program must use a PDA (Program Derived Address).
-- At least one TypeScript **test** for each Anchor program instruction. These tests should cover both **happy** and **unhappy** (intentional error-triggering) scenarios.
-- A simple **frontend** deployed using your preferred provider (for more info, check below).
-- A filled out **PROJECT_DESCRIPTION.md** file.
+## Project Overview
 
-### Ideas
-We highly recommend starting with something simple. Take time to think through your project and work on it in iterations. Do not try to implement everything at once!
+### Description
+The Music Player dApp is a comprehensive decentralized application that transforms how users interact with their music collections. Built on Solana's blockchain, it provides a secure, transparent, and user-owned platform for music metadata storage and playlist management. Unlike traditional centralized music platforms, this dApp ensures users maintain complete control over their music data, playlists, and listening preferences.
 
-Below is a list of few ideas to get you started:
-- **Social app**
-    - Instagram
-    - Giphy
-    - Friendtech
-    - Spotify
-- **Blog**
-- **Voting** ([D21 - Janeček method](https://www.ih21.org/en/guidelines))
-- **DeFi**
-    - Crowdfunding
-    - Raffles
-    - Escrow
-    - Tipping
-    - Lending ([Save Documentation](https://docs.save.finance/))
-    - Liquid Staking ([Marinade Documentation](https://docs.marinade.finance/))
-    - Data Query with Pyth ([Pyth Documentation](https://docs.pyth.network/price-feeds))
-    - AMM ([Raydium Documentation](https://raydium.gitbook.io/raydium/))
-- **Gaming**
-    - Browser Game ([Gaming on Solana](https://solanacookbook.com/gaming/nfts-in-games.html#nfts-in-games))
+The core functionality revolves around creating a decentralized music ecosystem where:
+- Users can upload track metadata (title, artist, genre) with IPFS-based audio file references
+- Playlists are stored on-chain as immutable, verifiable collections
+- All operations are transparent and auditable through blockchain transactions
+- User data ownership is guaranteed through cryptographic signatures
+- No central authority can censor or modify user content
 
-### Deadline
-The deadline for this task is **Wednesday, August 27th, at 23:59 UTC**.
->[!CAUTION]
->Note that we will not accept submissions after the deadline.
+### Key Features
+The dApp provides a rich set of features that demonstrate advanced Solana development concepts:
 
-### Submission
-There are two folders, one for the Anchor project, and one for the frontend. Push your changes to the **main** branch of **this** repository.
+- **Decentralized Track Management**: Upload and store track metadata on-chain with IPFS integration for audio files
+- **Smart Playlist Creation**: Create, manage, and share playlists with deterministic on-chain storage
+- **User Profile System**: Initialize and maintain user profiles with username and email verification
+- **Advanced Playlist Operations**: Add and remove tracks from playlists with proper authorization checks
+- **Real-time Blockchain Integration**: All operations are immediately reflected on the Solana blockchain
+- **Secure Ownership Model**: Cryptographic verification ensures only authorized users can modify their content
+- **Persistent Data Storage**: Music collections persist across sessions and are globally accessible
+- **Rate Limiting Protection**: Built-in protection against RPC endpoint abuse with intelligent retry mechanisms
+- **Automatic Album cover fetching**: 
 
->[!IMPORTANT]
->It is essential that you fill out the `PROJECT_DESCRIPTION.md` template completely and accurately. This document will be used by AI for the initial evaluation, so provide detailed information about your project, including working links, clear descriptions, and technical implementation details.
+### How to Use the dApp
+The dApp provides an intuitive user experience that abstracts away blockchain complexity:
 
-### Evaluation
-The evaluation process is based on the **requirements**. If you meet the requirements, you pass the task!
+#### Your wallet must be on Solana Devnet.
+#### Ensure your connected wallet has at least some SOL available — otherwise, transactions will fail during testing. You can request free SOL from the Devnet Faucet.
 
->[!NOTE]
->We have a record number of participants this season, so the first round of evaluations will be conducted by AI to verify requirements before manual review. AI can make mistakes. If you believe you fulfilled all requirements but weren't graded correctly, please create a support ticket and we will resolve the issue.
+1. **Connect Wallet**
+   - Click the **Connect Wallet** button in the top-right corner  
+   - Select your preferred Solana wallet (Phantom, Solflare, etc.)  
+   - Approve the connection to enable dApp functionality  
 
->[!CAUTION]
->We expect original work that demonstrates your understanding and creativity. While you may draw inspiration from examples covered in lessons and tasks, **direct copying is not acceptable**. If you choose to build upon an example from the School of Solana materials, you must significantly expand it with additional features, instructions, and functionality to showcase your learning progress. 
+2. **Upload Music Tracks**
+   - Click **Upload Track** in the header  
+   - Fill in track details: **Title, Artist, Genre**  
+   - Provide the **IPFS CID** for the audio file *(You can use [Pinata](https://pinata.cloud/))*  
 
-### Example Workflow
-Let's say you are going to implement the Twitter dApp as the Solana Program. Here's how the steps could look:
+   <details>
+     <summary><strong>📂 Publicly available sample CIDs (click to expand)</strong></summary>
 
-**1.** Implement Twitter dApp using the Anchor framework.
+     - **Danger** by JID  
+       `bafybeidoteq2nogc3cwaybnh7veyncebwrwsjv7zso5dupopvlpqwwr56a`  
 
-**2.** Test the Twitter dApp using the Anchor framework.
+     - **Tunnel Vision** by Talwinder  
+       `bafybeib7h4w6gi45e6b4kyksg6ya7bra5ozydkljns2f4tqzqsltpryupe`  
 
-**3.** Deploy the Twitter dApp on the Solana Devnet.
+     - **Betty** by AJR  
+       `bafybeihjqbxmcwmnjoa2xqlt7vbsdidor7kpm6uxe7h76vvka57fxw6e5y`  
 
-**4.** Using the create solana dapp template, implement frontend for the Twitter dApp.
+     - **Origami** by Rare Occasion  
+       `bafybeiekv2vbcxpcrr5bzny4x5w5k5mzdxihcj5776shek5yksbqfaa2wu`  
 
-**5.** Publish Frontend using [Vercel](https://vercel.com).
+   </details>  
 
-**6.** Fill out the PROJECT_DESCRIPTION.md template.
+   - Optionally add a **cover art IPFS CID** otherwise they will be automatically fetched via *album-art* if available  
+   - Submit the transaction to store track metadata on-chain  
 
-**7.** Submit the Twitter dApp using GitHub Classroom.
 
-### Useful Links
-- [Vercel](https://vercel.com)
-- [Create Solana Dapp](https://github.com/solana-foundation/create-solana-dapp)
-- [Account Macro Constraints](https://docs.rs/anchor-lang/latest/anchor_lang/derive.Accounts.html#constraints)
-- [Solana Developers Courses](https://solana.com/developers/courses)
+3. **Create Playlists**
+   - Use the sidebar to create new playlists
+   - Provide playlist name and description
+   - Each playlist gets a unique on-chain identifier
+   - Playlists are automatically associated with your wallet
 
------
+4. **Manage Music Library**
+   - View all uploaded tracks in "Your Library"
+   - Add tracks to playlists using the three-dot menu
+   - Remove tracks from playlists as needed
+   - Hide/restore tracks for better organization
 
-### Need help?
->[!TIP]
->If you have any questions, feel free to reach out to us on [Discord](https://discord.gg/z3JVuZyFnp).
+5. **Play Music**
+   - Click the play button on any track
+   - Use the persistent bottom player bar for continuous playback
+   - Navigate between tracks and playlists seamlessly
+
+## Program Architecture
+The Solana program is built using the Anchor framework and implements a sophisticated architecture for decentralized music management.
+
+### PDA Usage
+Program Derived Addresses (PDAs) are extensively used to create deterministic, user-specific account addresses that cannot be controlled by external private keys.
+
+**PDAs Used:**
+- **User Profile PDA**: `[b"user-profile", user_public_key]` - Creates unique user profile accounts for each wallet
+- **Track PDA**: `[b"track", owner_public_key, track_id]` - Generates unique track accounts for each uploaded track
+- **Playlist PDA**: `[b"playlist", owner_public_key, playlist_id]` - Creates unique playlist accounts for each user's playlists
+
+
+### Program Instructions
+The program implements five core instructions that provide comprehensive music management functionality:
+
+**Instructions Implemented:**
+- **`initialize_user`**: Creates user profile accounts with username and email validation
+  - Validates input lengths against program constants
+  - Initializes timestamps for audit trails
+  - Creates user-specific PDA accounts
+
+- **`upload_track`**: Stores track metadata on-chain with comprehensive validation
+  - Validates title, artist, genre, and URI lengths
+  - Generates unique track IDs using timestamps
+  - Stores IPFS references for audio files
+  - Maintains creation timestamps and ownership
+
+- **`create_playlist`**: Initializes new playlist accounts with metadata
+  - Validates playlist name and description lengths
+  - Creates empty track arrays for future additions
+  - Establishes ownership and creation timestamps
+  - Uses deterministic playlist IDs
+
+- **`add_track_to_playlist`**: Adds tracks to existing playlists with authorization
+  - Verifies playlist ownership through `has_one` constraint
+  - Prevents playlist overflow with maximum track limits
+  - Updates modification timestamps
+  - Maintains playlist integrity
+
+- **`remove_track_from_playlist`**: Removes tracks from playlists with proper validation
+  - Verifies track existence before removal
+  - Updates modification timestamps
+  - Maintains playlist consistency
+  - Provides clear error messages for missing tracks
+
+### Account Structure
+The program defines three main account structures that form the foundation of the music management system:
+
+```rust
+#[account]
+pub struct UserProfile {
+    pub user: Pubkey,           // Wallet public key of the user
+    pub username: String,        // User's chosen username
+    pub email: String,          // User's email address
+    pub created_at: i64,        // Unix timestamp of account creation
+    pub updated_at: i64,        // Unix timestamp of last update
+}
+
+#[account]
+pub struct Track {
+    pub id: u64,                // Unique track identifier
+    pub owner: Pubkey,          // Wallet public key of track owner
+    pub title: String,          // Track title
+    pub artist: String,         // Track artist
+    pub genre: String,          // Musical genre
+    pub uri: String,            // IPFS URI for audio file
+    pub created_at: i64,        // Unix timestamp of track creation
+}
+
+#[account]
+pub struct Playlist {
+    pub id: u64,                // Unique playlist identifier
+    pub owner: Pubkey,          // Wallet public key of playlist owner
+    pub name: String,           // Playlist name
+    pub description: String,    // Playlist description
+    pub tracks: Vec<u64>,       // Array of track IDs in the playlist
+    pub created_at: i64,        // Unix timestamp of playlist creation
+    pub updated_at: i64,        // Unix timestamp of last modification
+}
+```
+
+## Testing
+
+### Test Coverage
+Comprehensive testing approach covering happy paths, unhappy paths, and edge cases to ensure robust functionality and security. The test suite validates all program instructions, error conditions, and boundary cases to guarantee reliable operation.
+
+**Happy Path Tests:**
+- **User Profile Initialization**: Tests successful user profile creation with valid username and email, verifies account data persistence and timestamp accuracy
+- **Track Upload**: Tests complete track upload with all required metadata (title, artist, genre, URI), validates on-chain storage and data integrity
+- **Playlist Creation**: Tests playlist creation with name and description, ensures proper account initialization and metadata storage
+- **Track Management**: Tests adding and removing tracks from playlists successfully, validates playlist state changes and track associations
+
+**Unhappy Path Tests:**
+- **Validation Errors**: Tests username length limits and empty field handling, ensures proper error codes and user feedback
+- **Authorization Errors**: Tests access restrictions for playlist operations, verifies security constraints and ownership validation
+- **State Errors**: Tests operations on invalid states (e.g., removing from empty playlist), validates error handling for edge cases
+
+**Edge Case Tests:**
+- **Boundary Values**: Tests reasonable length strings and boundary conditions, ensures program stability under extreme inputs
+- **Special Characters**: Tests handling of special characters, emojis, and numbers in text fields, validates robust text processing
+
+### Running Tests
+```bash
+#install node modules
+npm install
+
+# Run all tests
+anchor test
+
+# Run with verbose output
+anchor test --verbose
+
+# Run specific test file
+anchor test tests/music_player.ts
+```
+
+### Test Results
+The comprehensive test suite demonstrates:
+- ✅ Proper account creation and state management across all instruction types
+- ✅ Correct PDA derivation and usage for deterministic addressing
+- ✅ Proper error handling and validation with appropriate error codes
+- ✅ Security constraints enforcement through ownership verification
+- ✅ Edge case handling for robust program operation
+- ✅ Rate limiting protection and graceful degradation
+- ✅ Transaction simulation and error logging for debugging
+
+## Technical Implementation Details
+
+### Frontend Architecture
+- **React 18** with TypeScript for type-safe development
+- **Tailwind CSS** for modern, responsive UI design
+- **Solana Wallet Adapter** for seamless wallet integration
+- **Anchor Client** for program interaction and transaction management
+- **Vite** for fast development and optimized builds
+
+### Blockchain Integration
+- **Solana Devnet** for development and testing
+- **Anchor Framework 0.31.1** for program development
+- **Program Derived Addresses** for deterministic account creation
+- **Cross-Program Invocation** for system program interactions
+- **Transaction optimization** with skipPreflight and confirmed commitment
+
+### Data Storage Strategy
+- **On-chain metadata** for track and playlist information
+- **IPFS integration** for decentralized audio file storage
+- **Local storage caching** for UI state and cover art
+- **Real-time blockchain queries** for up-to-date information
+
+### Security Features
+- **Ownership verification** through cryptographic signatures
+- **Input validation** with length limits and format checking
+- **Authorization checks** for all modification operations
+- **Rate limiting** to prevent abuse and ensure stability
+
+## Deployment Information
+
+### Program Deployment
+- **Network**: Solana Devnet
+- **Program ID**: B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie
+- **Deployment Method**: Anchor CLI deployment
+- **Build Optimization**: Release mode with size optimization
+
+### Frontend Deployment
+- **Platform**: Vercel 
+- **Build Tool**: Vite with optimized production builds
+- **Environment**: Production-ready with error handling and monitoring
+
+## Additional Notes for Evaluators
+
+I cannot state how much this project helped me in actually understanding how solana development works , I had never tried something like this before the Solana school and I am grateful for that. Understanding how a solana backend and frontend is connected , proper testing protocols , PDA and seeds were things that were foreign to me before this bootcamp and now I am going with alot of knowledge about these topics. 
+I will keep on working on this project and turn it into a actual viable product by changing some functionalities . It will head into a direction of a platform where you can buy music and keep it in your profile.
+
+
+## Screenshots 
+
+<img width="1919" height="938" alt="image" src="https://github.com/user-attachments/assets/5edae558-5f00-4c80-9f52-e226d445d15e" />
+<img width="559" height="611" alt="image" src="https://github.com/user-attachments/assets/77fe4be1-ae6e-4636-a873-858c4a25b9f9" />
+<img width="839" height="763" alt="image" src="https://github.com/user-attachments/assets/0d387505-e0e4-4c0e-a3b3-a80c0638da6f" />
