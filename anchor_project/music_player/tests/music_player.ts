@@ -18,7 +18,7 @@ describe("music_player", () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
   });
 
-  // ---------- Helpers ----------
+  //helpers
   const getUserProfilePda = (pubkey = user.publicKey) =>
     PublicKey.findProgramAddressSync(
       [Buffer.from("user-profile"), pubkey.toBuffer()],
@@ -37,7 +37,7 @@ describe("music_player", () => {
       program.programId
     );
 
-  // ---------- Happy Path ----------
+  //Happy Path 
   describe("Happy Path Tests", () => {
     it("Initializes a user profile", async () => {
       const [userProfilePda] = getUserProfilePda();
@@ -102,7 +102,6 @@ describe("music_player", () => {
       expect(playlist.name).to.equal("My Awesome Playlist");
       expect(playlist.description).to.equal("A collection of my favorite tracks");
       expect(playlist.tracks).to.deep.equal([]);
-      // Fix: createdAt and updatedAt are BN objects
       expect(playlist.createdAt).to.be.instanceOf(BN);
       expect(playlist.updatedAt).to.be.instanceOf(BN);
     });
@@ -142,7 +141,7 @@ describe("music_player", () => {
     });
   });
 
-  // ---------- Unhappy Paths & Edge Cases ----------
+  // Unhappy Paths & Edge Cases 
   describe("Unhappy Path Tests", () => {
     it("Fails to initialize user with username too long", async () => {
       const longUsername = "a".repeat(51); // Assuming MAX_USERNAME_LEN is 50

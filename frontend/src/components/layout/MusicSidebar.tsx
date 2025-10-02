@@ -1,4 +1,4 @@
-import { Home, Music, Plus, List } from "lucide-react";
+import { Home, Plus, List } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -30,9 +30,9 @@ export function MusicSidebar({ playlists, onCreatePlaylist }: MusicSidebarProps)
   const location = useLocation();
   const currentPath = location.pathname;
 
+  // Simplified navigation - removed redundant "My Library" item
   const navigationItems = [
     { title: "Home", url: "/", icon: Home },
-    { title: "My Library", url: "/library", icon: Music },
   ];
 
   const isActive = (path: string) => currentPath === path;
