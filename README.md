@@ -1,18 +1,21 @@
 # Music Player dApp
 
 ## Project Description
+
 A decentralized music player built on Solana that allows users to upload tracks, create playlists, and manage their music library on-chain. This dApp leverages Solana's high-performance blockchain to provide a secure, decentralized platform for music enthusiasts to store metadata, organize their music collections, and share playlists while maintaining full ownership of their data. Originally made for Ackee School of Solana final project.
 
 **Solana Program ID:** B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie
 
-**Deployment Link:** https://mulana.vercel.app/
+**Deployment Link:** <https://mulana.vercel.app/>
 
 ## Project Overview
 
 ### Description
+
 The Music Player dApp is a comprehensive decentralized application that transforms how users interact with their music collections. Built on Solana's blockchain, it provides a secure, transparent, and user-owned platform for music metadata storage and playlist management. Unlike traditional centralized music platforms, this dApp ensures users maintain complete control over their music data, playlists, and listening preferences.
 
 The core functionality revolves around creating a decentralized music ecosystem where:
+
 - Users can upload track metadata (title, artist, genre) with IPFS-based audio file references
 - Playlists are stored on-chain as immutable, verifiable collections
 - All operations are transparent and auditable through blockchain transactions
@@ -20,6 +23,7 @@ The core functionality revolves around creating a decentralized music ecosystem 
 - No central authority can censor or modify user content
 
 ### Key Features
+
 The dApp provides a rich set of features that demonstrate advanced Solana development concepts:
 
 - **Decentralized Track Management**: Upload and store track metadata on-chain with IPFS integration for audio files
@@ -30,13 +34,15 @@ The dApp provides a rich set of features that demonstrate advanced Solana develo
 - **Secure Ownership Model**: Cryptographic verification ensures only authorized users can modify their content
 - **Persistent Data Storage**: Music collections persist across sessions and are globally accessible
 - **Rate Limiting Protection**: Built-in protection against RPC endpoint abuse with intelligent retry mechanisms
-- **Automatic Album cover fetching**: 
+- **Automatic Album cover fetching**:
 
 ### How to Use the dApp
+
 The dApp provides an intuitive user experience that abstracts away blockchain complexity:
 
-#### Your wallet must be on Solana Devnet.
-#### Ensure your connected wallet has at least some SOL available — otherwise, transactions will fail during testing. You can request free SOL from the Devnet Faucet.
+#### Your wallet must be on Solana Devnet
+
+#### Ensure your connected wallet has at least some SOL available — otherwise, transactions will fail during testing. You can request free SOL from the Devnet Faucet
 
 1. **Connect Wallet**
    - Click the **Connect Wallet** button in the top-right corner  
@@ -68,7 +74,6 @@ The dApp provides an intuitive user experience that abstracts away blockchain co
    - Optionally add a **cover art IPFS CID** otherwise they will be automatically fetched via *album-art* if available  
    - Submit the transaction to store track metadata on-chain  
 
-
 3. **Create Playlists**
    - Use the sidebar to create new playlists
    - Provide playlist name and description
@@ -87,21 +92,25 @@ The dApp provides an intuitive user experience that abstracts away blockchain co
    - Navigate between tracks and playlists seamlessly
 
 ## Program Architecture
+
 The Solana program is built using the Anchor framework and implements a sophisticated architecture for decentralized music management.
 
 ### PDA Usage
+
 Program Derived Addresses (PDAs) are extensively used to create deterministic, user-specific account addresses that cannot be controlled by external private keys.
 
 **PDAs Used:**
+
 - **User Profile PDA**: `[b"user-profile", user_public_key]` - Creates unique user profile accounts for each wallet
 - **Track PDA**: `[b"track", owner_public_key, track_id]` - Generates unique track accounts for each uploaded track
 - **Playlist PDA**: `[b"playlist", owner_public_key, playlist_id]` - Creates unique playlist accounts for each user's playlists
 
-
 ### Program Instructions
+
 The program implements five core instructions that provide comprehensive music management functionality:
 
 **Instructions Implemented:**
+
 - **`initialize_user`**: Creates user profile accounts with username and email validation
   - Validates input lengths against program constants
   - Initializes timestamps for audit trails
@@ -132,6 +141,7 @@ The program implements five core instructions that provide comprehensive music m
   - Provides clear error messages for missing tracks
 
 ### Account Structure
+
 The program defines three main account structures that form the foundation of the music management system:
 
 ```rust
@@ -170,24 +180,29 @@ pub struct Playlist {
 ## Testing
 
 ### Test Coverage
+
 Comprehensive testing approach covering happy paths, unhappy paths, and edge cases to ensure robust functionality and security. The test suite validates all program instructions, error conditions, and boundary cases to guarantee reliable operation.
 
 **Happy Path Tests:**
+
 - **User Profile Initialization**: Tests successful user profile creation with valid username and email, verifies account data persistence and timestamp accuracy
 - **Track Upload**: Tests complete track upload with all required metadata (title, artist, genre, URI), validates on-chain storage and data integrity
 - **Playlist Creation**: Tests playlist creation with name and description, ensures proper account initialization and metadata storage
 - **Track Management**: Tests adding and removing tracks from playlists successfully, validates playlist state changes and track associations
 
 **Unhappy Path Tests:**
+
 - **Validation Errors**: Tests username length limits and empty field handling, ensures proper error codes and user feedback
 - **Authorization Errors**: Tests access restrictions for playlist operations, verifies security constraints and ownership validation
 - **State Errors**: Tests operations on invalid states (e.g., removing from empty playlist), validates error handling for edge cases
 
 **Edge Case Tests:**
+
 - **Boundary Values**: Tests reasonable length strings and boundary conditions, ensures program stability under extreme inputs
 - **Special Characters**: Tests handling of special characters, emojis, and numbers in text fields, validates robust text processing
 
 ### Running Tests
+
 ```bash
 #install node modules
 npm install
@@ -203,7 +218,9 @@ anchor test tests/music_player.ts
 ```
 
 ### Test Results
+
 The comprehensive test suite demonstrates:
+
 - ✅ Proper account creation and state management across all instruction types
 - ✅ Correct PDA derivation and usage for deterministic addressing
 - ✅ Proper error handling and validation with appropriate error codes
@@ -215,6 +232,7 @@ The comprehensive test suite demonstrates:
 ## Technical Implementation Details
 
 ### Frontend Architecture
+
 - **React 18** with TypeScript for type-safe development
 - **Tailwind CSS** for modern, responsive UI design
 - **Solana Wallet Adapter** for seamless wallet integration
@@ -222,6 +240,7 @@ The comprehensive test suite demonstrates:
 - **Vite** for fast development and optimized builds
 
 ### Blockchain Integration
+
 - **Solana Devnet** for development and testing
 - **Anchor Framework 0.31.1** for program development
 - **Program Derived Addresses** for deterministic account creation
@@ -229,12 +248,14 @@ The comprehensive test suite demonstrates:
 - **Transaction optimization** with skipPreflight and confirmed commitment
 
 ### Data Storage Strategy
+
 - **On-chain metadata** for track and playlist information
 - **IPFS integration** for decentralized audio file storage
 - **Local storage caching** for UI state and cover art
 - **Real-time blockchain queries** for up-to-date information
 
 ### Security Features
+
 - **Ownership verification** through cryptographic signatures
 - **Input validation** with length limits and format checking
 - **Authorization checks** for all modification operations
@@ -243,22 +264,24 @@ The comprehensive test suite demonstrates:
 ## Deployment Information
 
 ### Program Deployment
+
 - **Network**: Solana Devnet
 - **Program ID**: B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie
 - **Deployment Method**: Anchor CLI deployment
 - **Build Optimization**: Release mode with size optimization
 
 ### Frontend Deployment
-- **Platform**: Vercel 
+
+- **Platform**: Vercel
 - **Build Tool**: Vite with optimized production builds
 - **Environment**: Production-ready with error handling and monitoring
 
 ## Additional Notes for Evaluators
 
-
-
-## Screenshots 
+## Screenshots
 
 <img width="1919" height="938" alt="image" src="https://github.com/user-attachments/assets/5edae558-5f00-4c80-9f52-e226d445d15e" />
+
 <img width="559" height="611" alt="image" src="https://github.com/user-attachments/assets/77fe4be1-ae6e-4636-a873-858c4a25b9f9" />
+
 <img width="839" height="763" alt="image" src="https://github.com/user-attachments/assets/0d387505-e0e4-4c0e-a3b3-a80c0638da6f" />
