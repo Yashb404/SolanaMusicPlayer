@@ -28,33 +28,12 @@ pub mod music_player {
     track_id: u64,
     title: String,
     artist: String,
-    genre: String,
     uri: String,
 ) -> Result<()> {
-    instructions::upload_track::handler(ctx, track_id, title, artist, genre, uri)
+    instructions::upload_track::handler(ctx, track_id, title, uri)
 }
 
-    pub fn create_playlist(
-        ctx: Context<CreatePlaylist>,
-        playlist_id: u64,
-        name: String,
-        description: String,
-    ) -> Result<()> {
-        instructions::create_playlist::handler(ctx, playlist_id, name, description)
-    }    
 
-    pub fn add_track_to_playlist(
-    ctx: Context<AddTrackToPlaylist>,
-   
-) -> Result<()> {
-    instructions::add_track_to_playlist::handler(ctx)
-}
-
-pub fn remove_track_from_playlist(
-    ctx: Context<DeleteTrackFromPlaylist>,
-) -> Result<()> {
-    instructions::remove_track_from_playlist::handler(ctx)
-}
 
     
 }
