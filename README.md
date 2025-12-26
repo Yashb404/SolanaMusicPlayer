@@ -1,5 +1,5 @@
 # Music Player dApp
-
+<img width="1919" height="938" alt="image" src="https://github.com/user-attachments/assets/5edae558-5f00-4c80-9f52-e226d445d15e" />
 ## Project Description
 A decentralized music player built on Solana that allows users to upload tracks, create playlists, and manage their music library on-chain. This dApp leverages Solana's high-performance blockchain to provide a secure, decentralized platform for music enthusiasts to store metadata, organize their music collections, and share playlists while maintaining full ownership of their data. Originally made for Ackee School of Solana final project.
 
@@ -259,6 +259,6 @@ The comprehensive test suite demonstrates:
 
 ## Screenshots 
 
-<img width="1919" height="938" alt="image" src="https://github.com/user-attachments/assets/5edae558-5f00-4c80-9f52-e226d445d15e" />
+
 <img width="559" height="611" alt="image" src="https://github.com/user-attachments/assets/77fe4be1-ae6e-4636-a873-858c4a25b9f9" />
 <img width="839" height="763" alt="image" src="https://github.com/user-attachments/assets/0d387505-e0e4-4c0e-a3b3-a80c0638da6f" />
