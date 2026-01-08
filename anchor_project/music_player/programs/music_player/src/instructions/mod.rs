@@ -1,6 +1,5 @@
 pub mod initialize_user;
+pub mod upload_track;
 
-pub mod initialize_user::*;
-
-pub mod create_token::*;
-pub mod token_mint::*;
+pub use initialize_user::*;
+pub use upload_track::*;

@@ -5,7 +5,6 @@ pub mod instructions; // initialize_user.rs, upload_track.rs, etc.
 pub mod errors;       // error definitions
 
 pub use instructions::*;  // so InitializeUser, UploadTrack, etc. are visible
-use instructions::*;
 
 declare_id!("B4RYieJzdH81NwbNoVkRgfZuYBBNbNPKjhPWZ1NxkDie");
 
@@ -21,19 +20,12 @@ pub mod music_player {
         instructions::initialize_user::handler(ctx, username, email)
     }
 
-    
-
     pub fn upload_track(
-    ctx: Context<UploadTrack>,
-    track_id: u64,
-    title: String,
-    artist: String,
-    uri: String,
-) -> Result<()> {
-    instructions::upload_track::handler(ctx, track_id, title, uri)
-}
-
-
-
-    
+        ctx: Context<UploadTrack>,
+        track_id: u64,
+        title: String,
+        uri: String,
+    ) -> Result<()> {
+        instructions::upload_track::handler(ctx, track_id, title, uri)
+    }
 }

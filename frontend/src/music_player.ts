@@ -14,104 +14,6 @@ export type MusicPlayer = {
   },
   "instructions": [
     {
-      "name": "addTrackToPlaylist",
-      "discriminator": [
-        40,
-        122,
-        120,
-        88,
-        218,
-        58,
-        138,
-        92
-      ],
-      "accounts": [
-        {
-          "name": "playlist",
-          "writable": true
-        },
-        {
-          "name": "track"
-        },
-        {
-          "name": "owner",
-          "writable": true,
-          "signer": true,
-          "relations": [
-            "playlist"
-          ]
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "createPlaylist",
-      "discriminator": [
-        12,
-        221,
-        173,
-        119,
-        26,
-        182,
-        58,
-        49
-      ],
-      "accounts": [
-        {
-          "name": "playlist",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  108,
-                  97,
-                  121,
-                  108,
-                  105,
-                  115,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "signer"
-              },
-              {
-                "kind": "arg",
-                "path": "playlistId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "playlistId",
-          "type": "u64"
-        },
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "description",
-          "type": "string"
-        }
-      ]
-    },
-    {
       "name": "initializeUser",
       "discriminator": [
         111,
@@ -175,37 +77,6 @@ export type MusicPlayer = {
       ]
     },
     {
-      "name": "removeTrackFromPlaylist",
-      "discriminator": [
-        246,
-        227,
-        91,
-        80,
-        71,
-        221,
-        68,
-        3
-      ],
-      "accounts": [
-        {
-          "name": "playlist",
-          "writable": true
-        },
-        {
-          "name": "track"
-        },
-        {
-          "name": "owner",
-          "writable": true,
-          "signer": true,
-          "relations": [
-            "playlist"
-          ]
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "uploadTrack",
       "discriminator": [
         166,
@@ -264,14 +135,6 @@ export type MusicPlayer = {
           "type": "string"
         },
         {
-          "name": "artist",
-          "type": "string"
-        },
-        {
-          "name": "genre",
-          "type": "string"
-        },
-        {
           "name": "uri",
           "type": "string"
         }
@@ -279,19 +142,6 @@ export type MusicPlayer = {
     }
   ],
   "accounts": [
-    {
-      "name": "playlist",
-      "discriminator": [
-        132,
-        146,
-        3,
-        250,
-        182,
-        54,
-        96,
-        213
-      ]
-    },
     {
       "name": "track",
       "discriminator": [
@@ -383,44 +233,6 @@ export type MusicPlayer = {
   ],
   "types": [
     {
-      "name": "playlist",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "u64"
-          },
-          {
-            "name": "owner",
-            "type": "pubkey"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "name": "tracks",
-            "type": {
-              "vec": "u64"
-            }
-          },
-          {
-            "name": "createdAt",
-            "type": "i64"
-          },
-          {
-            "name": "updatedAt",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
       "name": "track",
       "type": {
         "kind": "struct",
@@ -435,14 +247,6 @@ export type MusicPlayer = {
           },
           {
             "name": "title",
-            "type": "string"
-          },
-          {
-            "name": "artist",
-            "type": "string"
-          },
-          {
-            "name": "genre",
             "type": "string"
           },
           {
