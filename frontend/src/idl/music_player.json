@@ -8,104 +8,6 @@
   },
   "instructions": [
     {
-      "name": "add_track_to_playlist",
-      "discriminator": [
-        40,
-        122,
-        120,
-        88,
-        218,
-        58,
-        138,
-        92
-      ],
-      "accounts": [
-        {
-          "name": "playlist",
-          "writable": true
-        },
-        {
-          "name": "track"
-        },
-        {
-          "name": "owner",
-          "writable": true,
-          "signer": true,
-          "relations": [
-            "playlist"
-          ]
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "create_playlist",
-      "discriminator": [
-        12,
-        221,
-        173,
-        119,
-        26,
-        182,
-        58,
-        49
-      ],
-      "accounts": [
-        {
-          "name": "playlist",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  108,
-                  97,
-                  121,
-                  108,
-                  105,
-                  115,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "signer"
-              },
-              {
-                "kind": "arg",
-                "path": "playlist_id"
-              }
-            ]
-          }
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "playlist_id",
-          "type": "u64"
-        },
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "description",
-          "type": "string"
-        }
-      ]
-    },
-    {
       "name": "initialize_user",
       "discriminator": [
         111,
@@ -169,37 +71,6 @@
       ]
     },
     {
-      "name": "remove_track_from_playlist",
-      "discriminator": [
-        246,
-        227,
-        91,
-        80,
-        71,
-        221,
-        68,
-        3
-      ],
-      "accounts": [
-        {
-          "name": "playlist",
-          "writable": true
-        },
-        {
-          "name": "track"
-        },
-        {
-          "name": "owner",
-          "writable": true,
-          "signer": true,
-          "relations": [
-            "playlist"
-          ]
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "upload_track",
       "discriminator": [
         166,
@@ -258,34 +129,13 @@
           "type": "string"
         },
         {
-          "name": "artist",
-          "type": "string"
-        },
-        {
-          "name": "genre",
-          "type": "string"
-        },
-        {
-          "name": "uri",
+          "name": "metadata_cid",
           "type": "string"
         }
       ]
     }
   ],
   "accounts": [
-    {
-      "name": "Playlist",
-      "discriminator": [
-        132,
-        146,
-        3,
-        250,
-        182,
-        54,
-        96,
-        213
-      ]
-    },
     {
       "name": "Track",
       "discriminator": [
@@ -377,44 +227,6 @@
   ],
   "types": [
     {
-      "name": "Playlist",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "id",
-            "type": "u64"
-          },
-          {
-            "name": "owner",
-            "type": "pubkey"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "name": "tracks",
-            "type": {
-              "vec": "u64"
-            }
-          },
-          {
-            "name": "created_at",
-            "type": "i64"
-          },
-          {
-            "name": "updated_at",
-            "type": "i64"
-          }
-        ]
-      }
-    },
-    {
       "name": "Track",
       "type": {
         "kind": "struct",
@@ -432,15 +244,7 @@
             "type": "string"
           },
           {
-            "name": "artist",
-            "type": "string"
-          },
-          {
-            "name": "genre",
-            "type": "string"
-          },
-          {
-            "name": "uri",
+            "name": "metadata_cid",
             "type": "string"
           },
           {

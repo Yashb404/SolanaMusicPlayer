@@ -22,10 +22,13 @@ pub fn handler(
     ctx: Context<UploadTrack>,
     track_id: u64,
     title: String,
-    uri: String,
+    metadata_cid: String,
 ) -> Result<()> {
     require!(title.len() <= Track::MAX_TITLE_LEN, ErrorCode::TrackTitleTooLong);
-    require!(uri.len() <= Track::MAX_URI_LEN, ErrorCode::InvalidInputData);
+    require!(
+        metadata_cid.len() <= Track::MAX_METADATA_CID_LEN,
+        ErrorCode::InvalidInputData
+    );
 
     let track = &mut ctx.accounts.track;
     let clock = Clock::get()?;
@@ -33,7 +36,7 @@ pub fn handler(
     track.id = track_id;
     track.owner = ctx.accounts.signer.key();
     track.title = title;
-    track.uri = uri;
+    track.metadata_cid = metadata_cid;
     track.created_at = clock.unix_timestamp;
 
     Ok(())

@@ -38,4 +38,10 @@ pub enum ErrorCode {
 
     #[msg("Genre exceeds maximum allowed length")]
     GenreTooLong,
+
+    #[msg("Listing is not active")]
+    ListingInactive,
+
+    #[msg("Insufficient listing supply")]
+    InsufficientListingSupply,
 }

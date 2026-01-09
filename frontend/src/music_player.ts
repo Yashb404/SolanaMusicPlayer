@@ -135,7 +135,7 @@ export type MusicPlayer = {
           "type": "string"
         },
         {
-          "name": "uri",
+          "name": "metadataCid",
           "type": "string"
         }
       ]
@@ -250,7 +250,7 @@ export type MusicPlayer = {
             "type": "string"
           },
           {
-            "name": "uri",
+            "name": "metadataCid",
             "type": "string"
           },
           {

@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/track-metadata.schema.json",
+  "title": "TrackMetadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "title",
+    "created_at",
+    "full"
+  ],
+  "properties": {
+    "schema": {
+      "type": "integer",
+      "const": 1,
+      "description": "Schema version for this metadata format."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "artist_wallet": {
+      "type": "string",
+      "description": "Base58 Solana pubkey (optional; informational only)."
+    },
+    "created_at": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Unix timestamp (seconds)."
+    },
+    "image_cid": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "Optional cover art CID (public)."
+    },
+    "preview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cid", "mime"],
+      "properties": {
+        "cid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "mime": { "type": "string", "minLength": 3, "maxLength": 64 },
+        "duration_seconds": { "type": "integer", "minimum": 1, "maximum": 60 }
+      }
+    },
+    "full": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encrypted_audio_cid", "mime", "encryption"],
+      "properties": {
+        "encrypted_audio_cid": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "description": "CID of encrypted audio bytes. Safe to be public."
+        },
+        "mime": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 64
+        },
+        "encryption": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["alg", "iv_b64"],
+          "properties": {
+            "alg": {
+              "type": "string",
+              "enum": ["AES-256-GCM"],
+              "description": "Encryption algorithm used for full audio."
+            },
+            "iv_b64": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128,
+              "description": "Base64 IV/nonce for decryption."
+            },
+            "tag_included": {
+              "type": "boolean",
+              "default": true,
+              "description": "Whether auth tag is included in the encrypted bytes."
+            }
+          }
+        }
+      }
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "encrypted_sha256_hex": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$"
+        },
+        "plaintext_sha256_hex": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$"
+        }
+      }
+    }
+  },
+  "not": {
+    "required": ["audio_cid"]
+  },
+  "description": "Public track metadata. MUST NOT contain plaintext full-audio CID. Use full.encrypted_audio_cid instead."
+}
